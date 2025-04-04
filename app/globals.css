@@ -1,0 +1,584 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Black and white palette based on stone */
+    --background: 0 0% 0%; /* Pure black */
+    --foreground: 0 0% 98%; /* Almost white */
+
+    --card: 0 0% 3%; /* Very dark gray */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary color - white with slight gray tint */
+    --primary: 0 0% 90%;
+    --primary-foreground: 0 0% 0%;
+
+    /* Secondary color - dark gray */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%; /* Medium gray */
+
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 0% 40%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%; /* Dark gray border */
+    --input: 0 0% 20%;
+    --ring: 0 0% 80%; /* Light gray ring */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Same as root since we're using dark by default */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 90%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 0% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 80%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Frosted glass effect para todos los elementos de la interfaz */
+@layer components {
+  .frosted-glass {
+    @apply bg-black/40 backdrop-blur-md border border-white/10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Aplicar efecto frosted glass a componentes comunes */
+  .card {
+    @apply frosted-glass !bg-transparent;
+  }
+
+  .btn, .button, button[type="submit"], button[type="button"] {
+    @apply frosted-glass !bg-transparent hover:bg-white/10 transition-colors;
+  }
+
+  /* Solo aplicar a footer y aside, excluyendo header y nav */
+  footer, aside {
+    @apply frosted-glass;
+  }
+
+  input, textarea, select {
+    @apply frosted-glass !bg-transparent;
+  }
+
+  .form-section, .contact-form, section[id], .project-card {
+    @apply frosted-glass;
+  }
+
+  /* Efecto hover para elementos interactivos */
+  .frosted-glass-hover {
+    @apply hover:bg-white/10 transition-all duration-300;
+  }
+
+  /* Efecto activo para elementos que lo necesiten */
+  .frosted-glass-active {
+    @apply bg-white/20;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes morph {
+  0% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: rotate(5deg) scale(1.08);
+  }
+  40% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: rotate(12deg) scale(1.12);
+  }
+  60% {
+    border-radius: 40% 60% 30% 70% / 30% 40% 70% 60%;
+    transform: rotate(5deg) scale(1.06);
+  }
+  80% {
+    border-radius: 60% 40% 50% 50% / 30% 30% 70% 70%;
+    transform: rotate(-8deg) scale(0.92);
+  }
+  100% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.animate-morph {
+  animation: morph 8s ease-in-out infinite;
+  will-change: transform, border-radius;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Nuevas animaciones con diferentes timing para evitar sincronización */
+@keyframes morph-alt1 {
+  0% {
+    border-radius: 50% 50% 40% 60% / 50% 50% 30% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+  33% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    transform: rotate(7deg) scale(1.05);
+  }
+  66% {
+    border-radius: 70% 30% 40% 60% / 50% 60% 30% 50%;
+    transform: rotate(-5deg) scale(0.95);
+  }
+  100% {
+    border-radius: 50% 50% 40% 60% / 50% 50% 30% 40%;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes morph-alt2 {
+  0% {
+    border-radius: 40% 40% 60% 30% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(0.95);
+  }
+  25% {
+    border-radius: 40% 60% 30% 70% / 60% 40% 70% 30%;
+    transform: rotate(-3deg) scale(1);
+  }
+  75% {
+    border-radius: 60% 60% 70% 30% / 30% 30% 70% 70%;
+    transform: rotate(5deg) scale(1.05);
+  }
+  100% {
+    border-radius: 40% 40% 60% 30% / 60% 30% 70% 40%;
+    transform: rotate(0deg) scale(0.95);
+  }
+}
+
+.animate-morph-alt1 {
+  animation: morph-alt1 12s ease-in-out infinite;
+  will-change: transform, border-radius;
+  backface-visibility: hidden;
+}
+
+.animate-morph-alt2 {
+  animation: morph-alt2 15s ease-in-out infinite;
+  will-change: transform, border-radius;
+  backface-visibility: hidden;
+}
+
+/* Animation for base character breaking */
+/* ... charBreakAnim definition ... */
+
+/* REMOVED Animation for Bleeding Pixel Jitter */
+/* @keyframes pixelJitter { ... } */
+/* .animate-pixel-jitter { ... } */
+
+/* Ensure base styles are set */
+/* ... rest of file ... */
+
+/* --- Glitch Principal Effect CSS --- */
+.title-container {
+  position: relative !important;
+  overflow: visible !important;
+  display: inline-block !important;
+  z-index: 99 !important;
+  transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+  will-change: transform !important;
+  isolation: isolate !important;
+}
+
+/* Estilo específico para elementos en el header y la navegación */
+header .title-container {
+  isolation: isolate !important;
+  z-index: 999 !important;
+}
+
+header .title-container.glitch-active::before,
+header .title-container.glitch-active::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible !important;
+  z-index: 9999 !important;
+  pointer-events: none;
+  clip-path: none !important;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.title-container.glitch-active {
+  position: relative; /* Necesario para los pseudo-elementos absolutos */
+  z-index: 6; /* Mayor que el contenedor normal para sobreponerse cuando está activo */
+}
+
+.title-container.glitch-active::before,
+.title-container.glitch-active::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible !important; /* Forzar overflow visible */
+  opacity: 0.8;
+  background: none;
+  z-index: 10; /* Mayor que el contenedor para que se vea por encima */
+  pointer-events: none; /* Para permitir interacciones con el texto base */
+  /* Usar variables para los colores si están definidas, o colores fijos */
+  /* --glitch-color-1 y --glitch-color-2 definidas en el style del ejemplo interactivo */
+}
+
+.title-container.glitch-active::before {
+  color: var(--glitch-color-1, magenta);
+  animation: glitchAnim1 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite alternate;
+}
+
+.title-container.glitch-active::after {
+  color: var(--glitch-color-2, cyan);
+  animation: glitchAnim2 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite alternate-reverse;
+}
+
+/* Keyframes para la animación del Glitch con soporte para escala */
+@keyframes glitchAnim1 {
+  0% { transform: translate(0); }
+  10% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+  20% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+  30% { transform: translate(calc(-2px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+  40% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(-2px * var(--glitch-scale, 1))); }
+  50% { transform: translate(0); }
+  60% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(2px * var(--glitch-scale, 1))); }
+  70% { transform: translate(calc(2px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+  80% { transform: translate(calc(-1px * var(--glitch-scale, 1)), 0px); }
+  90% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+  100% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+}
+
+@keyframes glitchAnim2 {
+  0% { transform: translate(0); }
+  10% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+  20% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+  30% { transform: translate(calc(2px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+  40% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(2px * var(--glitch-scale, 1))); }
+  50% { transform: translate(0); }
+  60% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(-2px * var(--glitch-scale, 1))); }
+  70% { transform: translate(calc(-2px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+  80% { transform: translate(calc(1px * var(--glitch-scale, 1)), 0px); }
+  90% { transform: translate(calc(-1px * var(--glitch-scale, 1)), calc(-1px * var(--glitch-scale, 1))); }
+  100% { transform: translate(calc(1px * var(--glitch-scale, 1)), calc(1px * var(--glitch-scale, 1))); }
+}
+
+/* Variantes para cambiar animación/timing */
+.title-container.glitch-active.glitch-variant-a::before {
+  animation-duration: 0.45s;
+}
+.title-container.glitch-active.glitch-variant-a::after {
+  animation-duration: 0.45s;
+}
+
+.title-container.glitch-active.glitch-variant-b::before {
+  animation-timing-function: steps(3, end);
+}
+.title-container.glitch-active.glitch-variant-b::after {
+  animation-timing-function: steps(4, start);
+}
+
+.title-container.glitch-active.glitch-variant-c::before {
+  animation-duration: 0.6s;
+  animation-timing-function: ease-in-out;
+}
+.title-container.glitch-active.glitch-variant-c::after {
+  animation-duration: 0.6s;
+  animation-timing-function: ease-in-out;
+}
+
+.title-container.glitch-active.glitch-variant-d::before {
+  animation-name: glitchAnim2; /* Intercambiar animaciones */
+}
+.title-container.glitch-active.glitch-variant-d::after {
+  animation-name: glitchAnim1;
+}
+
+.title-container.glitch-active.glitch-variant-e::before {
+  opacity: 0.6;
+  animation-delay: 0.05s;
+}
+.title-container.glitch-active.glitch-variant-e::after {
+  opacity: 0.6;
+  animation-delay: -0.05s;
+}
+/* --- Fin Glitch Principal Effect CSS --- */
+
+/* --- Rotura de Caracteres Effect CSS --- */
+.base-char {
+  display: inline-block; /* Necesario para transform */
+  position: relative;
+  overflow: visible !important; /* Forzar overflow visible */
+  z-index: 1;
+}
+
+.base-char.char-breaking {
+  animation: charBreakAnim 0.4s steps(6, end) forwards;
+  overflow: visible !important; /* Forzar overflow visible */
+}
+
+/* Soporte para variar la rotura de caracteres basado en el tamaño */
+.base-char.char-breaking-small {
+  --char-scale: 0.6; /* Para textos pequeños */
+}
+
+.base-char.char-breaking-medium {
+  --char-scale: 0.8; /* Para textos medianos */
+}
+
+.base-char.char-breaking-large {
+  --char-scale: 1.0; /* Para textos grandes (valor por defecto) */
+}
+
+@keyframes charBreakAnim {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); clip-path: none; }
+  20%  { opacity: 0.8; transform: translate(calc(-1px * var(--char-scale, 1)), calc(1px * var(--char-scale, 1))) scale(1.05) rotate(calc(-2deg * var(--char-scale, 1))); clip-path: none; }
+  40%  { opacity: 0.6; transform: translate(calc(1px * var(--char-scale, 1)), calc(-1px * var(--char-scale, 1))) scale(0.95) rotate(calc(1deg * var(--char-scale, 1))); clip-path: none; }
+  60%  { opacity: 0.5; transform: translate(calc(-2px * var(--char-scale, 1)), calc(-1px * var(--char-scale, 1))) scale(1.1) rotate(calc(3deg * var(--char-scale, 1))); clip-path: none; }
+  80%  { opacity: 0.3; transform: translate(calc(2px * var(--char-scale, 1)), calc(1px * var(--char-scale, 1))) scale(0.9) rotate(calc(-2deg * var(--char-scale, 1))); clip-path: none; }
+  100% { opacity: 1; transform: translate(0, 0) scale(1); clip-path: none; }
+}
+/* --- Fin Rotura de Caracteres Effect CSS --- */
+
+/* --- Aberración Cromática Effect CSS --- */
+.base-char::before,
+.base-char::after {
+  content: attr(data-char); /* Usa data-char por caracter */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Detrás del carácter principal */
+  pointer-events: none; /* Evitar que interfieran con eventos del texto */
+  overflow: visible !important; /* Forzar overflow visible */
+}
+
+/* --- Clases y Animaciones para Aberración Roja --- */
+.base-char.use-aberration-red-a::before { color: red; animation: charAberrationRedA 0.08s linear infinite alternate; }
+.base-char.use-aberration-red-b::before { color: red; animation: charAberrationRedB 0.1s linear infinite alternate-reverse; }
+.base-char.use-aberration-red-c::before { color: red; animation: charAberrationRedC 0.07s linear infinite alternate; }
+
+@keyframes charAberrationRedA {
+  0%, 100% { transform: translate(calc(-4px * var(--aberration-scale, 1)), calc(2px * var(--aberration-scale, 1))) skewX(calc(-10deg * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(3px * var(--aberration-scale, 1)), calc(-1px * var(--aberration-scale, 1))) skewX(calc(8deg * var(--aberration-scale, 1))); }
+}
+@keyframes charAberrationRedB {
+  0%, 100% { transform: translate(calc(-3px * var(--aberration-scale, 1)), calc(-1px * var(--aberration-scale, 1))) scaleY(calc(1.1 * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(4px * var(--aberration-scale, 1)), calc(1px * var(--aberration-scale, 1))) scaleY(calc(0.9 * var(--aberration-scale, 1))); }
+}
+@keyframes charAberrationRedC {
+  0%, 100% { transform: translate(calc(-5px * var(--aberration-scale, 1)), 0px) rotate(calc(3deg * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(2px * var(--aberration-scale, 1)), calc(1px * var(--aberration-scale, 1))) rotate(calc(-2deg * var(--aberration-scale, 1))); }
+}
+
+/* --- Clases y Animaciones para Aberración Azul --- */
+.base-char.use-aberration-blue-a::after { color: blue; animation: charAberrationBlueA 0.1s linear infinite alternate-reverse; }
+.base-char.use-aberration-blue-b::after { color: blue; animation: charAberrationBlueB 0.07s linear infinite alternate; }
+.base-char.use-aberration-blue-c::after { color: blue; animation: charAberrationBlueC 0.09s linear infinite alternate-reverse; }
+
+@keyframes charAberrationBlueA {
+  0%, 100% { transform: translate(calc(4px * var(--aberration-scale, 1)), calc(-2px * var(--aberration-scale, 1))) skewX(calc(10deg * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(-3px * var(--aberration-scale, 1)), calc(1px * var(--aberration-scale, 1))) skewX(calc(-8deg * var(--aberration-scale, 1))); }
+}
+@keyframes charAberrationBlueB {
+  0%, 100% { transform: translate(calc(3px * var(--aberration-scale, 1)), calc(1px * var(--aberration-scale, 1))) scaleY(calc(0.9 * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(-4px * var(--aberration-scale, 1)), calc(-1px * var(--aberration-scale, 1))) scaleY(calc(1.1 * var(--aberration-scale, 1))); }
+}
+@keyframes charAberrationBlueC {
+  0%, 100% { transform: translate(calc(5px * var(--aberration-scale, 1)), 0px) rotate(calc(-3deg * var(--aberration-scale, 1))); }
+  50%      { transform: translate(calc(-2px * var(--aberration-scale, 1)), calc(-1px * var(--aberration-scale, 1))) rotate(calc(2deg * var(--aberration-scale, 1))); }
+}
+/* --- Fin Aberración Cromática Effect CSS --- */
+
+/* --- Scanline Glitch Effect CSS (Regla eliminada, JS maneja clases) --- */
+/* 
+.line-glitching .base-char {
+  animation: charBreakAnim 0.2s steps(4, end) forwards; 
+  animation-delay: calc(var(--char-index, 0) * 0.008s);
+}
+*/
+/* --- Fin Scanline Glitch Effect CSS --- */
+
+/* --- Nuevo Efecto Glitch para Línea Completa --- */
+.line-glitching-main {
+  /* Aplicar animación de clip-path y leve translate */
+  animation: lineGlitchMainAnim 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes lineGlitchMainAnim {
+  0% { 
+    clip-path: inset(0 0 0 0);
+    transform: translateX(0);
+    opacity: 1;
+  }
+  10% { 
+    clip-path: inset(10% 0 85% 0);
+    transform: translateX(-2px);
+    opacity: 0.95;
+  }
+  20% { 
+    clip-path: inset(90% 0 5% 0);
+    transform: translateX(3px);
+  }
+  30% { 
+    clip-path: inset(5% 0 60% 0);
+    transform: translateX(-1px);
+    opacity: 0.9;
+  }
+  40% { 
+    clip-path: inset(50% 0 30% 0);
+    transform: translateX(2px);
+  }
+  50% { 
+    clip-path: inset(25% 0 70% 0);
+    transform: translateX(-2px);
+    opacity: 0.95;
+  }
+  60% { 
+    clip-path: inset(80% 0 10% 0);
+    transform: translateX(1px);
+  }
+  70% { 
+    clip-path: inset(40% 0 40% 0);
+    transform: translateX(-3px);
+    opacity: 0.9;
+  }
+  80% { 
+    clip-path: inset(65% 0 20% 0);
+    transform: translateX(2px);
+  }
+  90% { 
+    clip-path: inset(15% 0 80% 0);
+    transform: translateX(-1px);
+    opacity: 0.95;
+  }
+  100% { 
+    clip-path: inset(0 0 0 0); 
+    transform: translateX(0);
+    opacity: 1;
+  } /* Vuelve a la normalidad */
+}
+/* --- Fin Nuevo Efecto Glitch para Línea Completa --- */
+
+/* Asegurar que no se recorten efectos visuales en ningún nivel */
+nav, header, header nav, header nav a, header button, main {
+  overflow: visible !important;
+}
+
+header .title-container,
+header .title-container.glitch-active,
+header .title-container.glitch-active::before,
+header .title-container.glitch-active::after,
+header .base-char,
+header .base-char::before,
+header .base-char::after,
+header .base-char.char-breaking,
+header .base-char.use-aberration-red-a::before,
+header .base-char.use-aberration-blue-a::after {
+  overflow: visible !important;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+  z-index: 9999 !important;
+}
+
+/* Asegurar que todos los elementos del header tienen las propiedades correctas */
+header, 
+header *, 
+header nav, 
+header nav *, 
+header a, 
+header div,
+header button,
+header span,
+header .title-container,
+header .title-container *,
+header .base-char,
+header .base-char * {
+  overflow: visible !important;
+  transform-style: preserve-3d !important;
+  backface-visibility: hidden !important;
+  will-change: transform !important;
+}
+
+/* Asegurar el glitch en header sin cambiar la apariencia visual */
+.header-glitch-active,
+.header-glitch-active *,
+.nav-glitch-active,
+.nav-glitch-active * {
+  overflow: visible !important;
+}
+
+/* Estilo para que los caracteres rojos y azules salgan del contenedor */
+.header-glitch-active .base-char::before,
+.header-glitch-active .base-char::after {
+  overflow: visible !important;
+}
+
+/* Asignar z-index adecuados pero preservar las animaciones originales */
+.title-container.glitch-active::before,
+.title-container.glitch-active::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+/* Estilos base para caracteres y contenedores de título */
+.base-char {
+  position: relative;
+  display: inline-block;
+}
+
+.title-container {
+  position: relative;
+  display: inline-block;
+}
+
