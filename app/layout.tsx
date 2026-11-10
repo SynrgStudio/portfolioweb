@@ -1,48 +1,23 @@
-import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Archivo, JetBrains_Mono } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import { Toaster } from "@/components/ui/sonner"
-import { DynamicBackground } from "@/components/dynamic-background"
-import AnimatedNdLogo from "@/components/animated-nd-logo"
-import { LanguageProvider } from "@/contexts/LanguageContext"
+import { LanguageProvider } from "@/components/language"
 
-const inter = Inter({ subsets: ["latin"] })
+const sans = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-sans" })
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
-  title: "Portfolio | Creative Developer",
-  description: "Personal portfolio showcasing creative development work",
-    generator: 'v0.dev'
+  title: "SynrgStudio — software that doesn't make you wait",
+  description:
+    "SynrgStudio makes native tools for Windows, Blender add-ons and 3D models for print: Breadslicer, Seek, Jolt, Caliper and WebToMD.",
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.className} overflow-visible`} style={{overflow: 'visible'}}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <LanguageProvider>
-            <DynamicBackground />
-            <div className="min-h-screen flex flex-col overflow-visible" style={{overflow: 'visible'}}>
-              <Header />
-              <main className="flex-grow overflow-visible" style={{overflow: 'visible'}}>{children}</main>
-              <Footer />
-            </div>
-            <Toaster />
-            <AnimatedNdLogo />
-          </LanguageProvider>
-        </ThemeProvider>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+      <body className="font-sans">
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   )
 }
-
-
-
-import './globals.css'
