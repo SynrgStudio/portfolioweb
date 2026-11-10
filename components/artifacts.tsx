@@ -79,7 +79,7 @@ export function BreadslicerSteps() {
                 onMouseEnter={() => setActive(i)}
                 aria-current={i === active}
                 className="flex w-full flex-col gap-1 px-2 py-3 text-left transition-colors sm:px-3"
-                style={{ color: i === active ? "#f0f0ed" : "#73777b" }}
+                style={{ color: i === active ? "#f0f0ed" : "#83878b" }}
               >
                 <span className="truncate">{t.breadslicerSteps[step.key][0]}</span>
                 <span style={{ color: i === active ? "var(--tone)" : undefined }}>{step.time} s</span>

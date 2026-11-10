@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react"
 
 // El sólido del encabezado: un dodecaedro en alambre que gira despacio.
-// Con el cursor cerca, cada vértice tiende una línea hacia él, y la del más
-// cercano se dibuja como una cota: con topes y la distancia en píxeles.
+// Con el cursor cerca, cada vértice tiende una línea hacia él, y las de los
+// más cercanos se dibujan como cotas: con topes y la distancia en píxeles.
 
 const PHI = (1 + Math.sqrt(5)) / 2
 const VERTS: number[][] = []
@@ -24,7 +24,9 @@ for (let i = 0; i < VERTS.length; i++)
 
 const RADIUS = Math.sqrt(3) // del centro a cada vértice
 const CAMERA = 9
-const RANGE = 420 // px: hasta dónde un vértice alcanza al cursor
+const RANGE = 680 // px: hasta dónde un vértice alcanza al cursor
+const DIMS = 4 // cuántos vértices reciben cota
+const DIM_ALPHA = [0.9, 0.55, 0.4, 0.3]
 const INK = "240, 240, 237"
 
 export default function Solid() {
@@ -163,23 +165,24 @@ export default function Solid() {
         ctx.fillText(`ROT ${deg(angle)}°   TILT ${deg(tilt)}°`, cx + r, cy - r - 20)
       }
 
-      let nearest = -1
-      let nearestDist = RANGE
+      // Los vértices al alcance del cursor, del más cercano al más lejano
+      const reach: { i: number; d: number }[] = []
       if (mouse.inside && wide) {
         for (let i = 0; i < VERTS.length; i++) {
           const d = Math.hypot(mouse.x - px[i], mouse.y - py[i])
-          if (d >= RANGE) continue
-          if (d < nearestDist) {
-            nearestDist = d
-            nearest = i
-          }
-          const t = 1 - d / RANGE
-          ctx.strokeStyle = `rgba(${INK}, ${t * t * 0.28})`
-          ctx.beginPath()
-          ctx.moveTo(px[i], py[i])
-          ctx.lineTo(mouse.x, mouse.y)
-          ctx.stroke()
+          if (d < RANGE) reach.push({ i, d })
         }
+        reach.sort((m, n) => m.d - n.d)
+      }
+
+      // Una línea tenue desde cada uno, más marcada cuanto más cerca
+      for (const { i, d } of reach) {
+        const t = 1 - d / RANGE
+        ctx.strokeStyle = `rgba(${INK}, ${Math.pow(t, 1.4) * 0.42})`
+        ctx.beginPath()
+        ctx.moveTo(px[i], py[i])
+        ctx.lineTo(mouse.x, mouse.y)
+        ctx.stroke()
       }
 
       for (let i = 0; i < VERTS.length; i++) {
@@ -187,15 +190,20 @@ export default function Solid() {
         ctx.fillRect(Math.round(px[i]) - 1.5, Math.round(py[i]) - 1.5, 3, 3)
       }
 
-      // La cota al vértice más cercano
-      if (nearest >= 0 && nearestDist > 24) {
-        const ax = px[nearest]
-        const ay = py[nearest]
-        const dx = (mouse.x - ax) / nearestDist
-        const dy = (mouse.y - ay) / nearestDist
-        const nx = -dy
-        const ny = dx
-        ctx.strokeStyle = `rgba(${INK}, 0.9)`
+      // Las cotas: a los vértices más cercanos, la primera más marcada.
+      // Se dibujan de la más lejana a la más cercana, para que esta quede arriba.
+      ctx.font = `11px ${monoFamily}`
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      const dims = reach.slice(0, DIMS).filter(({ d }) => d > 24)
+      for (let k = dims.length - 1; k >= 0; k--) {
+        const { i, d } = dims[k]
+        const strength = DIM_ALPHA[k]
+        const ax = px[i]
+        const ay = py[i]
+        const nx = -(mouse.y - ay) / d
+        const ny = (mouse.x - ax) / d
+        ctx.strokeStyle = `rgba(${INK}, ${strength})`
         ctx.beginPath()
         ctx.moveTo(ax, ay)
         ctx.lineTo(mouse.x, mouse.y)
@@ -208,17 +216,17 @@ export default function Solid() {
         }
         ctx.stroke()
 
-        const label = `${Math.round(nearestDist)} px`
-        ctx.font = `11px ${monoFamily}`
+        // La etiqueta va sobre la línea, más cerca del vértice que del cursor,
+        // para que las de varias cotas no se pisen junto al puntero.
+        const label = `${Math.round(d)} px`
         const tw = ctx.measureText(label).width
         const side = ny > 0 ? -1 : 1 // siempre del lado de arriba
-        const lx = (ax + mouse.x) / 2 + nx * 14 * side
-        const ly = (ay + mouse.y) / 2 + ny * 14 * side
+        const along = k === 0 ? 0.5 : 0.3
+        const lx = ax + (mouse.x - ax) * along + nx * 14 * side
+        const ly = ay + (mouse.y - ay) * along + ny * 14 * side
         ctx.fillStyle = "#111214"
         ctx.fillRect(lx - tw / 2 - 4, ly - 8, tw + 8, 16)
-        ctx.fillStyle = `rgb(${INK})`
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
+        ctx.fillStyle = `rgba(${INK}, ${Math.min(1, strength + 0.1)})`
         ctx.fillText(label, lx, ly)
       }
 

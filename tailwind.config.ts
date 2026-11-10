@@ -15,7 +15,7 @@ const config: Config = {
         ink: "#f0f0ed",
         body: "#c9cacb",
         muted: "#a3a4a6",
-        faint: "#73777b",
+        faint: "#83878b",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],

@@ -8,6 +8,7 @@ import { BreadslicerSteps, CaliperSteps, Frame, JoltShot, SeekTranscript, TokenB
 import { Dim } from "@/components/technical"
 import SpecSheet from "@/components/spec-sheet"
 import ContactForm from "@/components/contact-form"
+import SiteStats from "@/components/site-stats"
 import { specLabels, specs } from "@/lib/specs"
 
 const artifacts: Record<ToolId, () => React.ReactNode> = {
@@ -95,7 +96,7 @@ function ToolArticle({ tool, index }: { tool: (typeof tools)[number]; index: num
         <div className="lg:col-span-6">
           <div className="mb-7 flex flex-wrap items-baseline gap-x-5 gap-y-1">
             {spec ? (
-              <button type="button" onClick={toggle} aria-expanded={open} aria-label={specLabels[lang].open}>
+              <button type="button" onClick={toggle} aria-expanded={open} title={specLabels[lang].open}>
                 {figure}
               </button>
             ) : (
@@ -152,7 +153,7 @@ export function Web() {
               const c = t.web.sites[site.id]
               return (
                 <article key={site.id} id={`site-${site.id}`} style={{ ["--tone" as string]: site.tone }}>
-                  <a href={site.href} target="_blank" rel="noopener noreferrer" className="block" aria-label={site.name}>
+                  <a href={site.href} target="_blank" rel="noopener noreferrer" className="block">
                     <Frame>
                       <div className="flex items-center justify-between gap-4 border-b border-line px-3 py-2 font-mono text-[11px] text-faint">
                         <span className="truncate text-muted">{site.host}</span>
@@ -268,19 +269,21 @@ export function Method() {
         <SectionHead sheet="C" label={t.method.label} title={t.method.title} body={t.method.body} />
 
         <div className="mt-14 grid gap-x-10 lg:grid-cols-12">
-          <dl className="border-t border-line lg:col-span-10 lg:col-start-3">
+          <div className="border-t border-line lg:col-span-10 lg:col-start-3">
             {t.method.rows.map((row, i) => (
               <div
                 key={row.name}
                 className="grid gap-x-10 gap-y-1 border-b border-line py-6 sm:grid-cols-[3rem_13rem_minmax(0,1fr)]"
               >
                 <span className="hidden pt-1.5 font-mono text-xs text-faint sm:block">C.{i + 1}</span>
-                <dt className="text-xl font-semibold text-ink">{row.name}</dt>
-                <dd className="max-w-2xl text-lg leading-relaxed text-muted">{row.body}</dd>
+                <h3 className="text-xl font-semibold text-ink">{row.name}</h3>
+                <p className="max-w-2xl text-lg leading-relaxed text-muted">{row.body}</p>
               </div>
             ))}
-          </dl>
+          </div>
         </div>
+
+        <SiteStats />
       </div>
     </section>
   )

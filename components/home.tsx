@@ -13,7 +13,7 @@ import { addons, sites, tools } from "@/lib/copy"
 function Rows({ code, rows }: { code: string; rows: { name: string; body: string; proof?: string }[] }) {
   return (
     <div className="mt-14 grid gap-x-10 lg:grid-cols-12">
-      <dl className="border-t border-line lg:col-span-10 lg:col-start-3">
+      <div className="border-t border-line lg:col-span-10 lg:col-start-3">
         {rows.map((row, i) => (
           <div
             key={row.name}
@@ -22,14 +22,14 @@ function Rows({ code, rows }: { code: string; rows: { name: string; body: string
             <span className="hidden pt-1.5 font-mono text-xs text-faint sm:block">
               {code}.{i + 1}
             </span>
-            <dt className="text-xl font-semibold text-ink">{row.name}</dt>
-            <dd className="max-w-2xl text-lg leading-relaxed text-muted">
+            <h3 className="text-xl font-semibold text-ink">{row.name}</h3>
+            <div className="max-w-2xl text-lg leading-relaxed text-muted">
               {row.body}
               {row.proof && <span className="mt-3 block font-mono text-xs uppercase tracking-wider text-ink">{row.proof}</span>}
-            </dd>
+            </div>
           </div>
         ))}
-      </dl>
+      </div>
     </div>
   )
 }

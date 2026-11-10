@@ -40,7 +40,7 @@ export default function TopBar() {
           <button
             type="button"
             onClick={() => setLang(lang === "en" ? "es" : "en")}
-            aria-label={lang === "en" ? "Cambiar a español" : "Switch to English"}
+            title={lang === "en" ? "Cambiar a español" : "Switch to English"}
             className="-my-2 flex items-center gap-1.5 border-l border-line py-2 pl-6"
           >
             <span className={lang === "en" ? "text-ink" : "text-faint"}>EN</span>
