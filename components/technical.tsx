@@ -106,6 +106,7 @@ export function Sheet() {
     const onMove = (e: MouseEvent) => {
       x = e.clientX
       y = e.clientY
+      el.style.visibility = "visible"
       el.style.opacity = "1"
       schedule()
     }
