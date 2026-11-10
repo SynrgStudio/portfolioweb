@@ -10,10 +10,11 @@ import { useLang } from "@/components/language"
 const MEASURED = {
   date: { en: "10 November 2026", es: "10 de noviembre de 2026" },
   tool: "Lighthouse 13.6",
-  desktop: { performance: 100, lcp: "0.6 s", blocking: "0 ms", shift: "0" },
-  mobile: { performance: 100, lcp: "0.9 s" },
-  weightKb: 293,
+  desktop: { performance: 100, lcp: "0.3 s", blocking: "0 ms", shift: "0" },
+  mobile: { performance: 99, lcp: "0.9 s" },
+  weightKb: 294,
   requests: 16,
+  accessibility: 100,
   bestPractices: 100,
   seo: 100,
 }
@@ -26,7 +27,7 @@ const text = {
     blocking: "with the page blocked while it loads",
     weight: (requests: number) => `to download the whole page, in ${requests} requests`,
     note: (m: typeof MEASURED) =>
-      `Measured on synrgs.tech with ${m.tool}, desktop profile, on ${m.date.en}. On the mobile profile: ${m.mobile.performance} and ${m.mobile.lcp}. Layout shift ${m.desktop.shift}, best practices ${m.bestPractices}, SEO ${m.seo}.`,
+      `Measured on synrgs.tech with ${m.tool}, desktop profile, on ${m.date.en}. On the mobile profile: ${m.mobile.performance} and ${m.mobile.lcp}. Layout shift ${m.desktop.shift}; accessibility ${m.accessibility}, best practices ${m.bestPractices}, SEO ${m.seo}. The times change a little from one run to the next.`,
   },
   es: {
     label: "Esta página, con la misma regla",
@@ -35,7 +36,7 @@ const text = {
     blocking: "con la página bloqueada mientras carga",
     weight: (requests: number) => `para descargar la página entera, en ${requests} pedidos`,
     note: (m: typeof MEASURED) =>
-      `Medido en synrgs.tech con ${m.tool}, perfil de escritorio, el ${m.date.es}. En el perfil de celular: ${m.mobile.performance} y ${m.mobile.lcp.replace(".", ",")}. Corrimiento de diseño ${m.desktop.shift}, buenas prácticas ${m.bestPractices}, SEO ${m.seo}.`,
+      `Medido en synrgs.tech con ${m.tool}, perfil de escritorio, el ${m.date.es}. En el perfil de celular: ${m.mobile.performance} y ${m.mobile.lcp.replace(".", ",")}. Corrimiento de diseño ${m.desktop.shift}; accesibilidad ${m.accessibility}, buenas prácticas ${m.bestPractices}, SEO ${m.seo}. Los tiempos cambian un poco de una corrida a otra.`,
   },
 }
 
