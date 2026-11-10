@@ -60,6 +60,7 @@ export default function Solid() {
       mouse.x = e.clientX - rect.left
       mouse.y = e.clientY - rect.top
       mouse.inside = mouse.x >= 0 && mouse.y >= 0 && mouse.x <= rect.width && mouse.y <= rect.height
+      lastMove = performance.now()
     }
     const onLeave = () => {
       mouse.inside = false
@@ -70,12 +71,19 @@ export default function Solid() {
     let last = 0
     let raf = 0
     let visible = true
+    let started = false
+    let lastMove = -Infinity
     const px = new Float32Array(VERTS.length)
     const py = new Float32Array(VERTS.length)
     const pz = new Float32Array(VERTS.length)
 
     const frame = (time: number) => {
       raf = 0
+      // El giro es lento: sin el cursor moviéndose alcanza con un cuadro de por medio.
+      if (last && time - last < (time - lastMove < 1500 ? 0 : 30)) {
+        schedule()
+        return
+      }
       const dt = last ? Math.min((time - last) / 1000, 0.05) : 0.016
       last = time
       if (!reduced) angle += dt * 0.11
@@ -234,7 +242,7 @@ export default function Solid() {
     }
 
     const schedule = () => {
-      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame)
+      if (started && !raf && visible && !document.hidden) raf = requestAnimationFrame(frame)
     }
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -248,9 +256,15 @@ export default function Solid() {
     window.addEventListener("mousemove", onMove, { passive: true })
     document.documentElement.addEventListener("mouseleave", onLeave)
     document.addEventListener("visibilitychange", schedule)
-    schedule()
+    // Arranca un momento después de que la página se arma, para no competir con ella.
+    const start = () => {
+      started = true
+      schedule()
+    }
+    const startTimer = window.setTimeout(start, 150)
 
     return () => {
+      window.clearTimeout(startTimer)
       observer.disconnect()
       window.removeEventListener("resize", resize)
       window.removeEventListener("mousemove", onMove)
@@ -260,5 +274,11 @@ export default function Solid() {
     }
   }, [])
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+    />
+  )
 }

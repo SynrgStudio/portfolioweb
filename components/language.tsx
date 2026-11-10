@@ -117,6 +117,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // La elección se recuerda; la primera visita sigue el idioma del navegador.
   useEffect(() => {
+    try {
+      performance.mark("synrg:interactive")
+      performance.measure("synrg:start-to-interactive", { start: 0, end: performance.now() })
+    } catch {}
+
     let saved: string | null = null
     try {
       saved = localStorage.getItem("lang")
