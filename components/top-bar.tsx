@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useLang } from "@/components/language"
+import Logo from "@/components/logo"
 import { Coords } from "@/components/technical"
 
 export default function TopBar() {
@@ -13,8 +14,9 @@ export default function TopBar() {
   return (
     <header className="topbar sticky top-0 z-50 border-b border-line">
       <div className="wrap flex h-14 items-center justify-between gap-6">
-        <Link href="/" className="display text-lg" style={{ letterSpacing: "-0.02em" }}>
-          SynrgStudio
+        <Link href="/" className="display flex items-center gap-2.5 text-lg" style={{ letterSpacing: "-0.02em" }}>
+          <Logo className="h-6 w-6" />
+          <span>SynrgStudio</span>
         </Link>
         <span className="mr-auto">
           <Coords />

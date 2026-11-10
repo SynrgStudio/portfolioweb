@@ -16,7 +16,7 @@ type ToolCopy = {
 }
 
 export type Copy = {
-  nav: { work: string; software: string; web: string; threeD: string; method: string; why: string; contact: string }
+  nav: { work: string; software: string; web: string; threeD: string; automation: string; method: string; why: string; contact: string }
   hero: { title: string; body: string; work: string; method: string }
   meter: {
     ready: (ms: number, requests: number, kb: number) => string
@@ -51,6 +51,17 @@ export type Copy = {
     body: string
     rows: { name: string; body: string }[]
   }
+  automation: {
+    label: string
+    title: string
+    body: string
+    name: string
+    kind: string
+    text: string
+    meta: string
+    figure: string
+    figureLabel: string
+  }
   does: { label: string; title: string; rows: { name: string; body: string; proof: string }[] }
   index: { label: string; title: string; body: string; all: string }
   why: { label: string; title: string; rows: { name: string; body: string }[] }
@@ -74,7 +85,7 @@ export type Copy = {
 
 export const copy: Record<Lang, Copy> = {
   en: {
-    nav: { work: "Work", software: "Software", web: "Web", threeD: "3D", method: "Method", why: "Why us", contact: "Contact" },
+    nav: { work: "Work", software: "Software", web: "Web", threeD: "3D", automation: "Automation", method: "Method", why: "Why us", contact: "Contact" },
     hero: {
       title: "Software that doesn't make you wait.",
       body: "SynrgStudio makes native tools for Windows, websites, Blender add-ons and 3D models for print. Each tool is measured before it ships, and the numbers go on its page.",
@@ -217,9 +228,20 @@ export const copy: Record<Lang, Copy> = {
         },
       ],
     },
+    automation: {
+      label: "Automation",
+      title: "The repeated steps, taken out.",
+      body: "The studio also automates work. This system runs its own miniature sales on Mercado Libre: it starts when a buyer pays and ends with the models on the print plate.",
+      name: "Sale to plate",
+      kind: "Order automation",
+      text: "A paid sale shows up as a notification on the workshop PC, with a page that has already found the model file of every product sold. One click sends them to the slicer.",
+      meta: "In daily use · two seller accounts · no AI involved",
+      figure: "1 click",
+      figureLabel: "from a paid sale to the models on the print plate",
+    },
     does: {
       label: "What we do",
-      title: "Three kinds of work, made the same way.",
+      title: "Four kinds of work, made the same way.",
       rows: [
         {
           name: "Software",
@@ -236,12 +258,17 @@ export const copy: Record<Lang, Copy> = {
           body: "Blender add-ons that take steps out of everyday modeling, and miniatures made for resin printing.",
           proof: "3 add-ons on Superhive",
         },
+        {
+          name: "Automation",
+          body: "Systems that connect a store, a PC and a program, so nobody copies things by hand. The first one runs the studio's own miniature sales.",
+          proof: "1 system in daily use",
+        },
       ],
     },
     index: {
       label: "Work",
       title: "Everything published so far.",
-      body: "Ten pieces of work. Each one opens with its screenshots and its numbers.",
+      body: "Eleven pieces of work. Each one opens with its screenshots and its numbers.",
       all: "All the work",
     },
     why: {
@@ -269,7 +296,7 @@ export const copy: Record<Lang, Copy> = {
     workPage: {
       label: "Work",
       title: "The work, piece by piece.",
-      body: "Software, websites and 3D. Every figure here came out of a real run.",
+      body: "Software, websites, 3D and automation. Every figure here came out of a real run.",
     },
     contact: {
       label: "Contact",
@@ -293,7 +320,7 @@ export const copy: Record<Lang, Copy> = {
   },
 
   es: {
-    nav: { work: "Trabajo", software: "Software", web: "Web", threeD: "3D", method: "Método", why: "Por qué", contact: "Contacto" },
+    nav: { work: "Trabajo", software: "Software", web: "Web", threeD: "3D", automation: "Automatización", method: "Método", why: "Por qué", contact: "Contacto" },
     hero: {
       title: "Software que no te hace esperar.",
       body: "SynrgStudio hace herramientas nativas para Windows, sitios web, addons de Blender y modelos 3D para imprimir. Cada herramienta se mide antes de salir, y los números van en su página.",
@@ -436,9 +463,20 @@ export const copy: Record<Lang, Copy> = {
         },
       ],
     },
+    automation: {
+      label: "Automatización",
+      title: "Los pasos repetidos, afuera.",
+      body: "El estudio también automatiza trabajo. Este sistema maneja sus propias ventas de miniaturas en Mercado Libre: empieza cuando un comprador paga y termina con los modelos en la placa de impresión.",
+      name: "De la venta a la placa",
+      kind: "Automatización de pedidos",
+      text: "Una venta pagada aparece como aviso en la PC del taller, con una página que ya encontró el archivo de cada producto vendido. Un clic los manda al slicer.",
+      meta: "En uso diario · dos cuentas de vendedor · sin IA",
+      figure: "1 clic",
+      figureLabel: "de una venta pagada a los modelos en la placa de impresión",
+    },
     does: {
       label: "Qué hacemos",
-      title: "Tres tipos de trabajo, hechos de la misma manera.",
+      title: "Cuatro tipos de trabajo, hechos de la misma manera.",
       rows: [
         {
           name: "Software",
@@ -455,12 +493,17 @@ export const copy: Record<Lang, Copy> = {
           body: "Addons de Blender que le sacan pasos al modelado de todos los días, y miniaturas hechas para imprimir en resina.",
           proof: "3 addons en Superhive",
         },
+        {
+          name: "Automatización",
+          body: "Sistemas que conectan una tienda, una PC y un programa, para que nadie copie cosas a mano. El primero maneja las ventas de miniaturas del propio estudio.",
+          proof: "1 sistema en uso diario",
+        },
       ],
     },
     index: {
       label: "Trabajo",
       title: "Todo lo publicado hasta hoy.",
-      body: "Diez trabajos. Cada uno se abre con sus capturas y sus números.",
+      body: "Once trabajos. Cada uno se abre con sus capturas y sus números.",
       all: "Todo el trabajo",
     },
     why: {
@@ -488,7 +531,7 @@ export const copy: Record<Lang, Copy> = {
     workPage: {
       label: "Trabajo",
       title: "El trabajo, pieza por pieza.",
-      body: "Software, sitios web y 3D. Cada cifra de acá salió de una corrida real.",
+      body: "Software, sitios web, 3D y automatización. Cada cifra de acá salió de una corrida real.",
     },
     contact: {
       label: "Contacto",

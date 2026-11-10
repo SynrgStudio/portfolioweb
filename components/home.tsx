@@ -83,6 +83,18 @@ export function WorkIndex() {
         tone: addon.tone,
       })),
     },
+    {
+      label: t.nav.automation,
+      items: [
+        {
+          anchor: "auto-sale",
+          name: t.automation.name,
+          kind: t.automation.kind,
+          figure: t.automation.figure,
+          tone: "#f2d94a",
+        },
+      ],
+    },
   ]
   let n = 0
 
@@ -161,6 +173,9 @@ export function WorkHead() {
           </a>
           <a href="#3d" className="go in">
             {t.nav.threeD} · {addons.length}
+          </a>
+          <a href="#automation" className="go in">
+            {t.nav.automation} · 1
           </a>
         </div>
       </div>
