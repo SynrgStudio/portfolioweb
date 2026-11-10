@@ -7,6 +7,40 @@
   --tone: #f0f0ed; /* acento vigente; cada herramienta lo redefine */
 }
 
+/* Tipografías de respaldo, mientras llega Archivo. Cada una va agrandada lo
+   justo para ocupar lo mismo que Archivo: así, cuando Archivo la reemplaza,
+   el texto no crece ni empuja lo que tiene abajo. Los valores salen de medir
+   el ancho del texto del sitio en cada fuente. Las "Wide" son para los
+   títulos, que usan Archivo ensanchada. */
+@font-face {
+  font-family: "Fallback Arial";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 98.6%;
+}
+@font-face {
+  font-family: "Fallback Roboto";
+  src: local("Roboto");
+  size-adjust: 101%;
+}
+@font-face {
+  font-family: "Fallback Wide Arial";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold"), local("Helvetica Neue Bold"), local("Helvetica Bold");
+  font-weight: 700;
+  size-adjust: 128%;
+}
+@font-face {
+  font-family: "Fallback Wide Roboto";
+  src: local("Roboto Bold"), local("Roboto-Bold");
+  font-weight: 700;
+  size-adjust: 131%;
+}
+@font-face {
+  font-family: "Fallback Wide DejaVu";
+  src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
+  font-weight: 700;
+  size-adjust: 110%;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
@@ -33,6 +67,7 @@ body {
 @layer components {
   /* Títulos: Archivo ensanchada. El ancho es parte de la marca. */
   .display {
+    font-family: var(--font-sans), "Fallback Wide Arial", "Fallback Wide Roboto", "Fallback Wide DejaVu", sans-serif;
     font-stretch: 125%;
     font-weight: 700;
     letter-spacing: -0.035em;

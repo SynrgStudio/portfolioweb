@@ -13,6 +13,7 @@ const sans = localFont({
   declarations: [{ prop: "font-stretch", value: "100% 125%" }],
   variable: "--font-sans",
   display: "swap",
+  adjustFontFallback: false, // las de respaldo están en globals.css, medidas a mano
 })
 const mono = localFont({
   src: "./fonts/jetbrains-mono.woff2",

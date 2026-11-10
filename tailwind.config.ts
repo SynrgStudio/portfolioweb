@@ -18,7 +18,7 @@ const config: Config = {
         faint: "#83878b",
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "Fallback Arial", "Fallback Roboto", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "Cascadia Code", "Consolas", "monospace"],
       },
       maxWidth: {
