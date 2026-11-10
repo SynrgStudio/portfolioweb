@@ -2,41 +2,38 @@
 
 import { useLang } from "@/components/language"
 
-// Las cifras de esta misma página, medidas con Lighthouse sobre el sitio
-// publicado. No se actualizan solas: son las de la fecha que se muestra.
-// Para medir de nuevo:
-//   npx lighthouse https://synrgs.tech/ --preset=desktop
-// y sin --preset para el perfil de celular. Después se cambian acá.
+// Las cifras de esta misma página, medidas sobre el sitio publicado con
+// PageSpeed Insights (el Lighthouse de Google, corrido desde sus servidores).
+// No se actualizan solas: son las de la fecha que se muestra. Para medir de
+// nuevo: https://pagespeed.web.dev/ con https://synrgs.tech/, en celular y en
+// escritorio; el peso y los pedidos salen de `npx lighthouse https://synrgs.tech/`.
 const MEASURED = {
   date: { en: "10 November 2026", es: "10 de noviembre de 2026" },
-  tool: "Lighthouse 13.6",
-  desktop: { performance: 100, lcp: "0.3 s", blocking: "0 ms", shift: "0" },
-  mobile: { performance: 99, lcp: "0.9 s" },
-  weightKb: 294,
-  requests: 16,
-  accessibility: 100,
-  bestPractices: 100,
-  seo: 100,
+  performance: 100, // en celular y en escritorio
+  mobileLcp: "0.9 s",
+  desktopLcp: "0.3 s",
+  weightKb: 257,
+  requests: 17,
 }
 
 const text = {
   en: {
     label: "This page, by the same rule",
-    performance: "Lighthouse performance score, out of 100",
-    lcp: "until the largest element is on screen",
-    blocking: "with the page blocked while it loads",
+    performance: "performance score, on mobile and on desktop",
+    mobile: "to show the page on a mid-range phone with slow 4G",
+    desktop: "to show it on a desktop",
     weight: (requests: number) => `to download the whole page, in ${requests} requests`,
-    note: (m: typeof MEASURED) =>
-      `Measured on synrgs.tech with ${m.tool}, desktop profile, on ${m.date.en}. On the mobile profile: ${m.mobile.performance} and ${m.mobile.lcp}. Layout shift ${m.desktop.shift}; accessibility ${m.accessibility}, best practices ${m.bestPractices}, SEO ${m.seo}. The times change a little from one run to the next.`,
+    note: (date: string) =>
+      `Measured on synrgs.tech with PageSpeed Insights (Lighthouse 13.6) on ${date}. On mobile it also scores 100 in accessibility, best practices and SEO. The times change a little from one run to the next.`,
   },
   es: {
     label: "Esta página, con la misma regla",
-    performance: "puntaje de rendimiento de Lighthouse, sobre 100",
-    lcp: "hasta que el elemento más grande está en pantalla",
-    blocking: "con la página bloqueada mientras carga",
+    performance: "puntaje de rendimiento, en celular y en escritorio",
+    mobile: "para mostrar la página en un celular de gama media con 4G lento",
+    desktop: "para mostrarla en una computadora",
     weight: (requests: number) => `para descargar la página entera, en ${requests} pedidos`,
-    note: (m: typeof MEASURED) =>
-      `Medido en synrgs.tech con ${m.tool}, perfil de escritorio, el ${m.date.es}. En el perfil de celular: ${m.mobile.performance} y ${m.mobile.lcp.replace(".", ",")}. Corrimiento de diseño ${m.desktop.shift}; accesibilidad ${m.accessibility}, buenas prácticas ${m.bestPractices}, SEO ${m.seo}. Los tiempos cambian un poco de una corrida a otra.`,
+    note: (date: string) =>
+      `Medido en synrgs.tech con PageSpeed Insights (Lighthouse 13.6) el ${date}. En celular también saca 100 en accesibilidad, buenas prácticas y SEO. Los tiempos cambian un poco de una corrida a otra.`,
   },
 }
 
@@ -45,9 +42,9 @@ export default function SiteStats() {
   const l = text[lang]
   const local = (value: string) => (lang === "es" ? value.replace(".", ",") : value)
   const numbers = [
-    { value: String(MEASURED.desktop.performance), label: l.performance },
-    { value: local(MEASURED.desktop.lcp), label: l.lcp },
-    { value: MEASURED.desktop.blocking, label: l.blocking },
+    { value: String(MEASURED.performance), label: l.performance },
+    { value: local(MEASURED.mobileLcp), label: l.mobile },
+    { value: local(MEASURED.desktopLcp), label: l.desktop },
     { value: `${MEASURED.weightKb} KB`, label: l.weight(MEASURED.requests) },
   ]
 
@@ -66,7 +63,7 @@ export default function SiteStats() {
             </div>
           ))}
         </dl>
-        <p className="mt-4 font-mono text-xs leading-relaxed text-faint">{l.note(MEASURED)}</p>
+        <p className="mt-4 font-mono text-xs leading-relaxed text-faint">{l.note(MEASURED.date[lang])}</p>
       </div>
     </div>
   )
