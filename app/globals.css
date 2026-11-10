@@ -7,38 +7,45 @@
   --tone: #f0f0ed; /* acento vigente; cada herramienta lo redefine */
 }
 
-/* Tipografías de respaldo, mientras llega Archivo. Cada una va agrandada lo
-   justo para ocupar lo mismo que Archivo: así, cuando Archivo la reemplaza,
-   el texto no crece ni empuja lo que tiene abajo. Los valores salen de medir
-   el ancho del texto del sitio en cada fuente. Las "Wide" son para los
-   títulos, que usan Archivo ensanchada. */
+/* Tipografías de respaldo, mientras llega Archivo. Cada una va agrandada para
+   ocupar apenas más que Archivo (un 1 %): así, cuando Archivo la reemplaza, el
+   texto nunca crece. Si creciera, el navegador lo tomaría como un elemento
+   nuevo pintado tarde, y el LCP se iría a ese momento. Los valores salen de
+   medir el ancho del texto del sitio en cada fuente (Arial y Liberation Sans
+   miden lo mismo; DejaVu es la de muchos Linux, como el de PageSpeed). Las
+   "Wide" son para los títulos, que usan Archivo ensanchada. */
 @font-face {
   font-family: "Fallback Arial";
-  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo"), local("Helvetica Neue"), local("Helvetica");
-  size-adjust: 98.6%;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans"), local("Arimo"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 99.6%;
 }
 @font-face {
   font-family: "Fallback Roboto";
-  src: local("Roboto");
-  size-adjust: 101%;
+  src: local("Roboto"), local("Roboto-Regular");
+  size-adjust: 100.3%;
+}
+@font-face {
+  font-family: "Fallback DejaVu";
+  src: local("DejaVu Sans"), local("DejaVuSans");
+  size-adjust: 87.8%;
 }
 @font-face {
   font-family: "Fallback Wide Arial";
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold"), local("Helvetica Neue Bold"), local("Helvetica Bold");
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"), local("Arimo Bold"), local("Helvetica Neue Bold"), local("Helvetica Bold");
   font-weight: 700;
-  size-adjust: 128%;
+  size-adjust: 128.7%;
 }
 @font-face {
   font-family: "Fallback Wide Roboto";
   src: local("Roboto Bold"), local("Roboto-Bold");
   font-weight: 700;
-  size-adjust: 131%;
+  size-adjust: 136%;
 }
 @font-face {
   font-family: "Fallback Wide DejaVu";
   src: local("DejaVu Sans Bold"), local("DejaVuSans-Bold");
   font-weight: 700;
-  size-adjust: 110%;
+  size-adjust: 107%;
 }
 
 html {

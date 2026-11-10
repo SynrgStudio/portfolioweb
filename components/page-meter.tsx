@@ -33,7 +33,9 @@ export default function PageMeter() {
   }, [])
 
   return (
-    <p className="font-mono text-xs leading-relaxed text-faint">
+    // El alto queda reservado para el texto final: si creciera al terminar de
+    // medir, empujaría hacia arriba el título y el párrafo del encabezado.
+    <p className="min-h-[3lh] font-mono text-xs leading-relaxed text-faint sm:min-h-[2lh] lg:min-h-[1lh]">
       <span className="mr-2 inline-block h-1.5 w-1.5 -translate-y-px rounded-full bg-[#6fcf97]" />
       {m ? (
         <>
