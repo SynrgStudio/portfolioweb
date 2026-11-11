@@ -1,0 +1,7 @@
+{
+  // www.synrgs.tech → synrgs.tech, con la misma ruta y la misma query.
+  "name": "synrgs-www",
+  "main": "index.js",
+  "routes": [{ "pattern": "www.synrgs.tech", "custom_domain": true }],
+  "compatibility_date": "2026-10-01"
+}

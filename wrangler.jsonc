@@ -1,0 +1,11 @@
+{
+  // Solo archivos estáticos: Cloudflare los sirve sin correr código, gratis y sin límite de pedidos.
+  "name": "synrgs-portfolio",
+  "routes": [{ "pattern": "synrgs.tech", "custom_domain": true }],
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

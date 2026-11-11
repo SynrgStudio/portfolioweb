@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // El sitio es estático: `next build` lo deja en out/ y GitHub Pages lo sirve.
+  // El sitio es estático: `next build` lo deja en out/ y Cloudflare lo sirve (wrangler.jsonc).
   output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
