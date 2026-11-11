@@ -137,7 +137,7 @@ export const copy: Record<Lang, Copy> = {
       },
       webtomd: {
         kind: "Markdown proxy for LLMs",
-        body: "Put md.synrgs.tech/v1/ in front of any URL and get the page back as clean Markdown, without the navigation, scripts and styles a model would pay to read.",
+        body: "Put md.synrgs.tech/v1/ in front of any URL and get the page back as clean Markdown, without the navigation, scripts and styles a model would pay to read. The instance is private, with a key per person; the code is open, to run your own.",
         figure: "−99%",
         figureLabel: "tokens to read the CNN homepage",
         meta: "HTTP API · free · open source",
@@ -372,7 +372,7 @@ export const copy: Record<Lang, Copy> = {
       },
       webtomd: {
         kind: "Proxy de Markdown para LLM",
-        body: "Poné md.synrgs.tech/v1/ delante de cualquier URL y recibís la página en Markdown limpio, sin la navegación, los scripts ni los estilos que un modelo pagaría por leer.",
+        body: "Poné md.synrgs.tech/v1/ delante de cualquier URL y recibís la página en Markdown limpio, sin la navegación, los scripts ni los estilos que un modelo pagaría por leer. La instancia es privada, con una clave por persona; el código es abierto, para montar la tuya.",
         figure: "−99%",
         figureLabel: "de tokens para leer la portada de CNN",
         meta: "API HTTP · gratis · código abierto",
