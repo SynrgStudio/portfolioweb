@@ -40,3 +40,10 @@ El estudio hace software nativo, addons de Blender y modelos 3D. Lo que tienen e
 - **Trabajo (`app/work/page.tsx`)**: el detalle. Software con sus fichas cortas (`lib/specs.ts`, `components/spec-sheet.tsx`), Web y 3D con los tres addons de Superhive.
 - Las fichas son cortas a pedido del usuario: cuatro cifras, una comparación y cuatro puntos fuertes. El detalle largo queda en la página de cada herramienta.
 - Fondo: grilla de puntos cada 20 px (`Sheet` en `components/technical.tsx`).
+
+## Caliper Bridge (15 nov 2026)
+
+- Cuarto addon de la sección 3D (`addons` en `lib/copy.ts`), el único gratis y en GitHub: cada addon dice dónde se consigue en `get` (tienda, o repo y zip). Con cuatro, la grilla va en dos columnas.
+- Las capturas originales de la extensión están en `media/caliper-bridge/` (fuera de `public/`, no se publican). La tarjeta es un recorte de `1-analysis.png`.
+- Repo público: SynrgStudio/caliper-blender. El repo de Caliper es privado: no se nombra ni se enlaza.
+- Publicar: `npm run deploy` (build estático y `wrangler deploy` a Cloudflare), y push a GitHub.

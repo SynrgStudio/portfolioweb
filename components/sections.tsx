@@ -204,7 +204,7 @@ export function ThreeD() {
 
         <div className="mt-14 grid gap-x-10 lg:grid-cols-12">
           <div className="lg:col-span-10 lg:col-start-3">
-            <div className="grid gap-x-8 gap-y-16 md:grid-cols-3">
+            <div className="grid gap-x-10 gap-y-16 md:grid-cols-2">
               {addons.map((addon, i) => {
                 const c = t.threeD.addons[addon.id]
                 return (
@@ -216,7 +216,7 @@ export function ThreeD() {
                           alt={addon.name}
                           width={1200}
                           height={600}
-                          sizes="(max-width: 768px) 100vw, 330px"
+                          sizes="(max-width: 768px) 100vw, 520px"
                           className="h-auto w-full"
                         />
                       </Frame>
@@ -232,10 +232,12 @@ export function ThreeD() {
                     </p>
                     <p className="mt-5 leading-relaxed text-body">{c.body}</p>
                     <p className="mt-4 font-mono text-xs text-faint">{addon.meta}</p>
-                    <p className="mt-6 font-mono text-sm">
-                      <a href={addon.href} target="_blank" rel="noopener noreferrer" className="go">
-                        Superhive
-                      </a>
+                    <p className="mt-6 flex flex-wrap gap-x-7 gap-y-3 font-mono text-sm">
+                      {addon.get.map((g) => (
+                        <a key={g.href} href={g.href} target="_blank" rel="noopener noreferrer" className="go break-all">
+                          {g.label}
+                        </a>
+                      ))}
                     </p>
                   </article>
                 )

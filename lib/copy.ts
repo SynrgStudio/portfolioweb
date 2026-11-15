@@ -5,7 +5,7 @@
 export type Lang = "en" | "es"
 export type ToolId = "breadslicer" | "seek" | "jolt" | "caliper" | "webtomd"
 export type SiteId = "puertorolero" | "breadslicer"
-export type AddonId = "damtools" | "bambu" | "cleaner"
+export type AddonId = "damtools" | "bambu" | "cleaner" | "bridge"
 
 type ToolCopy = {
   kind: string
@@ -182,7 +182,7 @@ export const copy: Record<Lang, Copy> = {
     threeD: {
       label: "3D",
       title: "Miniatures and Blender add-ons.",
-      body: "SynrgStudio also designs in 3D: miniatures for wargaming and tabletop RPGs, made for resin printing, and add-ons for Blender. Three add-ons are published on Superhive.",
+      body: "SynrgStudio also designs in 3D: miniatures for wargaming and tabletop RPGs, made for resin printing, and add-ons for Blender. Three add-ons are published on Superhive, and Caliper Bridge, free and open source, on GitHub.",
       models: "The models are on Patreon and Ko-fi.",
       addons: {
         damtools: {
@@ -202,6 +202,12 @@ export const copy: Record<Lang, Copy> = {
           figure: "1 click",
           figureLabel: "from a messy mesh to a clean one",
           body: "Removes loose geometry, merges duplicate vertices, turns triangles into quads and recalculates normals. Hold Alt and it repeats until the mesh is clean.",
+        },
+        bridge: {
+          kind: "Check, repair, export",
+          figure: "9 STL",
+          figureLabel: "from a body, 3 heads and 2 optional weapons, in one click",
+          body: "Connects Blender with Caliper. It draws each error on the model in its own colour, repairs each object into a new one and leaves the original untouched, and exports print-ready STL. In variants mode it writes every combination of the parts, already repaired.",
         },
       },
     },
@@ -256,7 +262,7 @@ export const copy: Record<Lang, Copy> = {
         {
           name: "3D",
           body: "Blender add-ons that take steps out of everyday modeling, and miniatures made for resin printing.",
-          proof: "3 add-ons on Superhive",
+          proof: "4 Blender add-ons",
         },
         {
           name: "Automation",
@@ -277,7 +283,7 @@ export const copy: Record<Lang, Copy> = {
       rows: [
         {
           name: "It gets finished",
-          body: "Nothing here is a concept. Five tools, three add-ons and two sites are published and in use today.",
+          body: "Nothing here is a concept. Five tools, four add-ons and two sites are published and in use today.",
         },
         {
           name: "Numbers, not adjectives",
@@ -417,7 +423,7 @@ export const copy: Record<Lang, Copy> = {
     threeD: {
       label: "3D",
       title: "Miniaturas y addons de Blender.",
-      body: "SynrgStudio también diseña en 3D: miniaturas para wargames y juegos de rol de mesa, hechas para imprimir en resina, y addons para Blender. Hay tres addons publicados en Superhive.",
+      body: "SynrgStudio también diseña en 3D: miniaturas para wargames y juegos de rol de mesa, hechas para imprimir en resina, y addons para Blender. Hay tres addons publicados en Superhive, y Caliper Bridge, gratis y de código abierto, en GitHub.",
       models: "Los modelos están en Patreon y Ko-fi.",
       addons: {
         damtools: {
@@ -437,6 +443,12 @@ export const copy: Record<Lang, Copy> = {
           figure: "1 clic",
           figureLabel: "de una malla desprolija a una limpia",
           body: "Quita geometría suelta, une vértices duplicados, convierte triángulos en quads y recalcula las normales. Con Alt apretado, repite hasta que la malla queda limpia.",
+        },
+        bridge: {
+          kind: "Revisar, reparar, exportar",
+          figure: "9 STL",
+          figureLabel: "de un cuerpo, 3 cabezas y 2 armas opcionales, con un clic",
+          body: "Conecta Blender con Caliper. Dibuja cada error sobre el modelo con su color, repara cada objeto en uno nuevo sin tocar el original y exporta STL listos para imprimir. En el modo variantes escribe todas las combinaciones de las piezas, ya reparadas.",
         },
       },
     },
@@ -491,7 +503,7 @@ export const copy: Record<Lang, Copy> = {
         {
           name: "3D",
           body: "Addons de Blender que le sacan pasos al modelado de todos los días, y miniaturas hechas para imprimir en resina.",
-          proof: "3 addons en Superhive",
+          proof: "4 addons de Blender",
         },
         {
           name: "Automatización",
@@ -512,7 +524,7 @@ export const copy: Record<Lang, Copy> = {
       rows: [
         {
           name: "Se termina",
-          body: "Acá nada es un concepto. Cinco herramientas, tres addons y dos sitios están publicados y en uso hoy.",
+          body: "Acá nada es un concepto. Cinco herramientas, cuatro addons y dos sitios están publicados y en uso hoy.",
         },
         {
           name: "Números, no adjetivos",
@@ -637,12 +649,15 @@ export const addons: {
   href: string
   image: string
   tone: string
+  // Dónde se consigue: la tienda, o el repo y el zip que se instala.
+  get: { label: string; href: string }[]
 }[] = [
   {
     id: "damtools",
     name: "damTools",
     meta: "v1.8.1 · Blender 4.5 – 5.0",
     href: "https://superhivemarket.com/products/damtools",
+    get: [{ label: "Superhive", href: "https://superhivemarket.com/products/damtools" }],
     image: "/addons/damtools.webp",
     tone: "#e4e4e7",
   },
@@ -651,6 +666,7 @@ export const addons: {
     name: "Blender → Bambu Studio",
     meta: "v1.1.2 · Blender 3.0 – 4.3",
     href: "https://superhivemarket.com/products/blender-bambustudio-export",
+    get: [{ label: "Superhive", href: "https://superhivemarket.com/products/blender-bambustudio-export" }],
     image: "/addons/bambu-export.webp",
     tone: "#2fbf5b",
   },
@@ -659,8 +675,21 @@ export const addons: {
     name: "1-Click Mesh Cleaner",
     meta: "v1.0.1 · Blender 4.2 – 5.0",
     href: "https://superhivemarket.com/products/1-click-mesh-cleaner",
+    get: [{ label: "Superhive", href: "https://superhivemarket.com/products/1-click-mesh-cleaner" }],
     image: "/addons/mesh-cleaner.webp",
     tone: "#a9c93a",
+  },
+  {
+    id: "bridge",
+    name: "Caliper Bridge",
+    meta: "v0.3.0 · Blender 4.2+ · Caliper 0.9.8+ · GPL-3.0",
+    href: "https://github.com/SynrgStudio/caliper-blender",
+    get: [
+      { label: "GitHub", href: "https://github.com/SynrgStudio/caliper-blender" },
+      { label: "caliper_bridge-0.3.0.zip", href: "https://github.com/SynrgStudio/caliper-blender/releases/download/v0.3.0/caliper_bridge-0.3.0.zip" },
+    ],
+    image: "/addons/caliper-bridge.webp",
+    tone: "#f68a3b",
   },
 ]
 
