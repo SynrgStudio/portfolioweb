@@ -139,6 +139,14 @@ export function CaliperSteps() {
   const { t } = useLang()
   return (
     <Frame>
+      <Image
+        src="/tools/caliper-analysis.webp"
+        alt="Caliper"
+        width={1400}
+        height={788}
+        sizes="(max-width: 1024px) 100vw, 700px"
+        className="h-auto w-full border-b border-line"
+      />
       <ol>
         {t.caliperSteps.map(([name, body], i) => (
           <li

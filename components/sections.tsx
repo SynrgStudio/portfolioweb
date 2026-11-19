@@ -80,6 +80,15 @@ function ToolArticle({ tool, index }: { tool: (typeof tools)[number]; index: num
               </a>
             )}
           </div>
+          {tool.store && c.store && (
+            // El badge oficial de Microsoft, sin tocar (solo se escala), en el idioma de la página.
+            <div className="mt-7">
+              <a href={tool.store} target="_blank" rel="noopener noreferrer" className="inline-block transition-opacity hover:opacity-85">
+                <Image src={`/tools/microsoft-store-${lang}.svg`} alt={c.store.alt} width={161} height={44} className="h-11 w-auto" />
+              </a>
+              <p className="mt-3 max-w-[22rem] text-sm leading-relaxed text-muted">{c.store.note}</p>
+            </div>
+          )}
           {spec && (
             <button
               type="button"

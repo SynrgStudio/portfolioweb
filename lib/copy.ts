@@ -13,6 +13,8 @@ type ToolCopy = {
   figure: string
   figureLabel: string
   meta: string
+  // Solo si la herramienta está en la Microsoft Store: el texto bajo el badge y el alt del badge.
+  store?: { note: string; alt: string }
 }
 
 export type Copy = {
@@ -134,6 +136,7 @@ export const copy: Record<Lang, Copy> = {
         figure: "106 / 106",
         figureLabel: "real test models come out of a repair closed",
         meta: "Windows · Linux in Nightly · free",
+        store: { note: "Or from the Microsoft Store: signed by Microsoft and kept up to date for you.", alt: "Download from the Microsoft Store" },
       },
       webtomd: {
         kind: "Markdown proxy for LLMs",
@@ -375,6 +378,7 @@ export const copy: Record<Lang, Copy> = {
         figure: "106 / 106",
         figureLabel: "modelos reales de prueba salen cerrados de una reparación",
         meta: "Windows · Linux en Nightly · gratis",
+        store: { note: "O desde Microsoft Store: firmado por Microsoft y siempre actualizado.", alt: "Descargar desde Microsoft Store" },
       },
       webtomd: {
         kind: "Proxy de Markdown para LLM",
@@ -575,6 +579,8 @@ export const tools: {
   tone: string
   site: { label: string; href: string }
   repo?: string
+  // La ficha en la Microsoft Store, si está publicada ahí.
+  store?: string
 }[] = [
   {
     id: "breadslicer",
@@ -597,6 +603,7 @@ export const tools: {
     icon: "/tools/caliper.svg",
     tone: "#f68a3b",
     site: { label: "caliper.synrgs.tech", href: "https://caliper.synrgs.tech" },
+    store: "https://apps.microsoft.com/detail/9P7V6VGWHDST?mode=full",
   },
   {
     id: "jolt",

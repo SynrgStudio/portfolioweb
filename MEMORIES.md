@@ -47,3 +47,8 @@ El estudio hace software nativo, addons de Blender y modelos 3D. Lo que tienen e
 - Las capturas originales de la extensión están en `media/caliper-bridge/` (fuera de `public/`, no se publican). La tarjeta es un recorte de `1-analysis.png`.
 - Repo público: SynrgStudio/caliper-blender. El repo de Caliper es privado: no se nombra ni se enlaza.
 - Publicar: `npm run deploy` (build estático y `wrangler deploy` a Cloudflare), y push a GitHub.
+
+## Microsoft Store (19 nov 2026)
+
+- Caliper está en la Microsoft Store ("Caliper 3D", ID 9P7V6VGWHDST). `store` en `tools` (lib/copy.ts) pone el badge oficial bajo los links de la herramienta, con su texto en `t.tools.<id>.store`.
+- Los badges son los SVG oficiales de Microsoft, sin tocar: `public/tools/microsoft-store-en.svg` y `-es.svg`, elegidos por idioma. El de español está en `get.microsoft.com/images/es%20dark.svg` (`es-es` da 404). Microsoft no deja recolorearlos ni recortarlos: solo escalarlos.
