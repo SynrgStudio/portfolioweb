@@ -89,7 +89,7 @@ export default function Ecosystem() {
   const br = at(2)
   const bs = at(3)
   const calStep = cal < 0.5 ? 0 : cal < 0.8 ? 1 : 2
-  const bsStep = bs < 0.14 ? 0 : bs < 0.44 ? 1 : 2
+  const bsStep = bs < 0.2 ? 0 : bs < 0.48 ? 1 : 2
   const brStep = br < 0.38 ? 0 : br < 0.56 ? 1 : br < 0.72 ? 2 : 3
   const d = stats.damaged
   const repaired = cal >= 0.8
@@ -182,12 +182,13 @@ export default function Ecosystem() {
         </Panel>
         <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
           <span className="label mr-1">{t.bread.chunks}</span>
-          {(stats.chunks ?? [{ tag: "SCNE", bytes: 0 }, { tag: "MESH", bytes: 0 }]).map((c) => (
-            <span key={c.tag} className="border px-2 py-1" style={{ borderColor: "rgba(242,227,194,.4)", color: TONE.bread }}>
-              {c.tag}
+          {chunkList(stats.project).map(([tag, k]) => (
+            <span key={tag} className="border px-2 py-1" style={{ borderColor: "rgba(242,227,194,.4)", color: TONE.bread }}>
+              {tag}
+              {k > 1 && <span className="text-faint"> ×{k}</span>}
             </span>
           ))}
-          {["SUPP", "HOLW", "SPRV", "ROLE", "META"].map((c) => (
+          {["HOLW", "SPRV", "ROLE", "META"].filter((c) => !stats.project?.some((x) => x.tag === c)).map((c) => (
             <span key={c} className="border border-dashed border-line-strong px-2 py-1 text-faint">
               {c}
             </span>
@@ -217,6 +218,7 @@ export default function Ecosystem() {
                       ms(stats.sliceMs),
                     )}
                   </p>
+                  {stats.supports && <p className="mt-1 leading-relaxed text-faint">{t.slicer.rebuilt(ms(stats.supports.ms), n(stats.supports.triangles))}</p>}
                   <div className="mt-3 h-1 w-full bg-line">
                     <div className="h-full" style={{ width: `${((stats.layer ?? 0) / (stats.layers || 1)) * 100}%`, background: TONE.slicer }} />
                   </div>
@@ -227,7 +229,18 @@ export default function Ecosystem() {
             </div>
           </div>
         </Panel>
-        <p className="text-xs leading-relaxed text-faint">{t.slicer.note}</p>
+        <p className="text-xs leading-relaxed text-faint">
+          {stats.supports
+            ? t.slicer.real({
+                bases: n(stats.supports.bases),
+                trunks: n(stats.supports.trunks),
+                branches: n(stats.supports.branches + stats.supports.twigs + stats.supports.sticks),
+                leaves: n(stats.supports.leaves),
+                braces: n(stats.supports.braces),
+                tips: n(stats.supports.tips),
+              })
+            : t.slicer.note}
+        </p>
         <Facts facts={t.slicer.facts} tone={TONE.slicer} />
       </Chapter>
 
@@ -290,6 +303,17 @@ export default function Ecosystem() {
 }
 
 // ---------------------------------------------------------------------- piezas
+
+/** Los chunks del archivo en su orden, con cuántos hay de cada uno. */
+function chunkList(list?: { tag: string }[]): [string, number][] {
+  const out: [string, number][] = []
+  for (const c of list ?? [{ tag: "SCNE" }, { tag: "MESH" }]) {
+    const last = out.find((x) => x[0] === c.tag)
+    if (last) last[1]++
+    else out.push([c.tag, 1])
+  }
+  return out
+}
 
 function Chapter({ refFn, vh, tone, kicker, title, body, children }: { refFn: (el: HTMLElement | null) => void; vh: number; tone: string; kicker: string; title: string; body: string; children: React.ReactNode }) {
   return (

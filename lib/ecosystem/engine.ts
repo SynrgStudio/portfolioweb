@@ -4,8 +4,9 @@
 // El modelo es real (MZ4250, CC BY 4.0), y todo lo que se muestra de él se calcula acá.
 
 import * as THREE from "three"
-import { load } from "@/lib/bread-format/index.js"
-import { analyze, bounds, cornerMismatches, damage, rasterize, slice, supportTips, toStl, type Analysis, type Bounds, type Mesh, type Tip } from "./mesh"
+import { load, placeMeshes } from "@/lib/bread-format/index.js"
+import { analyze, bounds, clearLayer, cornerMismatches, damage, fillLayer, rasterize, slice, supportTips, toStl, type Analysis, type Bounds, type Mesh, type Tip } from "./mesh"
+import { buildSupports, readSupp, type Supports } from "./supports"
 
 export type Stats = {
   triangles?: number
@@ -33,6 +34,9 @@ export type Stats = {
   sliceMs?: number
   heightMm?: number
   webgl?: boolean
+  project?: { tag: string; bytes: number }[]
+  real?: boolean // los soportes y la orientación salen del proyecto de Breadslicer
+  supports?: Supports["counts"] & { ms: number; triangles: number }
 }
 
 const LIFT = 5 // mm: Breadslicer levanta 5 mm un modelo que apoya en la placa
@@ -61,7 +65,7 @@ const KEYS: Key[] = [
   { theta: 0.0, phi: 0.12, dist: 134, ty: 25, shift: 0.27 },
   { theta: 0.0, phi: 0.05, dist: 104, ty: 26, shift: 0.2 },
   { theta: 0.0, phi: 0.1, dist: 120, ty: 26, shift: 0.2 },
-  { theta: -0.55, phi: 0.4, dist: 140, ty: 23, shift: 0.2 },
+  { theta: -0.55, phi: 0.36, dist: 168, ty: 27, shift: 0.2 },
   { theta: 0.6, phi: 0.25, dist: 160, ty: 24, shift: 0.22 },
   { theta: 0.9, phi: 0.25, dist: 190, ty: 24, shift: 0.0 },
 ]
@@ -118,6 +122,10 @@ export class Engine {
   private lastSupportGrow = -1
   private running = true
   private sliceSeg: Float32Array = new Float32Array(8192)
+  // El proyecto de Breadslicer: la orientación de la placa y los soportes rebuilt desde SUPP.
+  private real?: { R: THREE.Quaternion; cV: THREE.Vector3; cU: THREE.Vector3; cP: THREE.Vector3; placed: Mesh; sup: Supports; supMesh?: THREE.Mesh; top: number }
+  private supClip = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e4)
+  private plateContour?: THREE.LineSegments
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -180,6 +188,12 @@ export class Engine {
       heightMm: this.b.max[2] - this.b.min[2],
     })
     this.k = (this.b.max[2] - this.b.min[2]) / 50
+    this.stats.project = chunks.map((c: { tag: string; payload?: Uint8Array }) => ({ tag: c.tag, bytes: c.payload?.byteLength ?? 0 }))
+    try {
+      this.readProject(reader, chunks)
+    } catch {
+      this.real = undefined
+    }
     this.emit()
     this.state = damage(mesh, this.b)
     this.build()
@@ -188,6 +202,41 @@ export class Engine {
     this.loop()
     // Lo que cuesta CPU va después de que la miniatura se armó, para no trabar la entrada.
     setTimeout(() => this.measure(reader, base), this.reduced ? 100 : 2600)
+  }
+
+  /** Si el archivo es un proyecto de Breadslicer: dónde va el modelo en la placa, y sus soportes. */
+  private readProject(reader: Awaited<ReturnType<typeof load>>, chunks: { tag: string; payload: Uint8Array }[]) {
+    const supp = chunks.find((c) => c.tag === "SUPP")
+    const doc = supp ? readSupp(supp.payload) : null
+    if (!doc || doc.generator !== "df" || doc.version > 2) return // un documento que no conocemos: como si no estuviera
+    const place = placeMeshes(reader.decodeScene(chunks as never)).find((x: { mesh: number }) => x.mesh === 0)
+    if (!place) return
+    const M = new THREE.Matrix4().fromArray(place.matrix)
+    const V = this.mesh!.vertices
+    const pv = new Float32Array(V.length)
+    const e = M.elements
+    for (let i = 0; i < V.length; i += 3) {
+      const x = V[i], y = V[i + 1], z = V[i + 2]
+      pv[i] = e[0] * x + e[4] * y + e[8] * z + e[12]
+      pv[i + 1] = e[1] * x + e[5] * y + e[9] * z + e[13]
+      pv[i + 2] = e[2] * x + e[6] * y + e[10] * z + e[14]
+    }
+    const placed = { vertices: pv, triangles: this.mesh!.triangles }
+    const pb = bounds(pv)
+    const sup = buildSupports(doc.doc)
+    const b = this.b!
+    const cV = new THREE.Vector3((b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, (b.min[2] + b.max[2]) / 2)
+    const R = new THREE.Quaternion().setFromRotationMatrix(M)
+    this.real = {
+      R,
+      cV,
+      cU: new THREE.Vector3(0, 0, (b.max[2] - b.min[2]) / 2),
+      cP: cV.clone().applyMatrix4(M),
+      placed,
+      sup,
+      top: Math.max(pb.max[2], sup.max[2]),
+    }
+    Object.assign(this.stats, { real: true, supports: { ...sup.counts, ms: sup.ms, triangles: sup.triangles.length / 3 } })
   }
 
   private async measure(reader: Awaited<ReturnType<typeof load>>, base: string) {
@@ -305,7 +354,8 @@ export class Engine {
     this.buildPoints()
     this.buildCubes()
     this.buildPlate()
-    this.buildSupports()
+    if (this.real) this.buildRealSupports()
+    else this.buildSupports()
 
     const cg = new THREE.BufferGeometry()
     cg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(3 * 2 * 8192), 3))
@@ -479,6 +529,25 @@ export class Engine {
     this.scene.add(g)
   }
 
+  /** Los soportes del proyecto, como Breadslicer los guarda, rearmados pieza por pieza. */
+  private buildRealSupports() {
+    const r = this.real!
+    const g = new THREE.BufferGeometry()
+    g.setAttribute("position", new THREE.BufferAttribute(r.sup.vertices, 3))
+    g.setIndex(new THREE.BufferAttribute(r.sup.triangles, 1))
+    g.computeVertexNormals()
+    const mat = new THREE.MeshStandardMaterial({ color: C.support, roughness: 0.48, metalness: 0.12, side: THREE.DoubleSide, clippingPlanes: [this.clip, this.supClip] })
+    r.supMesh = new THREE.Mesh(g, mat)
+    r.supMesh.visible = false
+    this.group.add(r.supMesh) // el grupo está en coordenadas de la placa: Z arriba, en mm
+    const cg = new THREE.BufferGeometry()
+    cg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(3 * 2 * 16384), 3))
+    cg.setDrawRange(0, 0)
+    this.plateContour = new THREE.LineSegments(cg, new THREE.LineBasicMaterial({ color: C.amber, transparent: true, depthTest: false }))
+    this.plateContour.renderOrder = 10
+    this.group.add(this.plateContour)
+  }
+
   private buildSupports() {
     const b = this.b!
     this.tips = supportTips(this.mesh!, b)
@@ -643,23 +712,38 @@ export class Engine {
       const m = (c as THREE.Mesh).material as THREE.Material & { opacity: number }
       m.opacity = (c.userData.base ?? 1) * plateOn
     })
-    const lift = LIFT * smooth(0.02, 0.16, bs)
-    this.lifted.position.z = -this.b!.min[2] + lift
-    const grow = ch >= 3 ? smooth(0.14, 0.42, bs) : 0
-    this.growSupports(grow)
-    const supVis = grow > 0.001
-    for (const m of Object.values(this.supports!)) m.visible = supVis
+    const r = this.real
+    let top: number
+    if (r) {
+      // de parado a como lo dejó Breadslicer: girado y levantado, alrededor de su centro
+      const o = smooth(0.02, 0.2, bs)
+      const q = new THREE.Quaternion().slerpQuaternions(new THREE.Quaternion(), r.R, o)
+      const c = r.cU.clone().lerp(r.cP, o)
+      this.lifted.quaternion.copy(q)
+      this.lifted.position.copy(c.sub(r.cV.clone().applyQuaternion(q)))
+      const grow = ch >= 3 ? smooth(0.2, 0.47, bs) : 0
+      this.supClip.constant = grow >= 1 ? 1e4 : grow * r.top
+      r.supMesh!.visible = grow > 0.001
+      top = r.top
+    } else {
+      const lift = LIFT * smooth(0.02, 0.16, bs)
+      this.lifted.position.z = -this.b!.min[2] + lift
+      const grow = ch >= 3 ? smooth(0.14, 0.42, bs) : 0
+      this.growSupports(grow)
+      const supVis = grow > 0.001
+      for (const m of Object.values(this.supports!)) m.visible = supVis
+      if (this.supports) this.supports.raft.visible = supVis
+      top = this.b!.max[2] - this.b!.min[2] + LIFT
+    }
 
     // el corte: el plano sube de la placa a la punta del modelo
-    const top = this.b!.max[2] - this.b!.min[2] + LIFT
-    const cut = ch === 3 ? smooth(0.46, 0.94, bs) : 0
-    const slicing = ch === 3 && bs > 0.44 && bs < 0.985
+    const cut = ch === 3 ? smooth(0.5, 0.95, bs) : 0
+    const slicing = ch === 3 && bs > 0.48 && bs < 0.985
     const h = slicing ? Math.max(LAYER, cut * top) : 1e4
     this.clip.constant = verifying ? scanH : h
     this.ghostClip.constant = -h
     this.ghost!.visible = slicing
     this.mats.ghost!.opacity = slicing ? 0.06 : 0
-    if (this.supports) this.supports.raft.visible = supVis
     this.updateLayer(slicing, h, top)
 
     // en la cadena queda de fondo, y antes de lo medido se apaga
@@ -725,10 +809,12 @@ export class Engine {
     const cg = this.contour!.geometry
     if (!slicing) {
       cg.setDrawRange(0, 0)
+      this.plateContour?.geometry.setDrawRange(0, 0)
       Object.assign(this.stats, { layer: 0, layers })
       this.emit()
       return
     }
+    if (this.real) return this.realLayer(layer, layers, h)
     // en coordenadas del archivo: la altura del plano menos lo que se levantó
     ;(this.contour!.material as THREE.LineBasicMaterial).color.copy(C.amber)
     const z = this.b!.min[2] + (h - LIFT)
@@ -749,6 +835,58 @@ export class Engine {
     ;(cg.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true
     cg.setDrawRange(0, count * 2)
     this.drawLayer(seg, count, h)
+    Object.assign(this.stats, { layer, layers, layerZ: h, segments: count, sliceMs })
+    this.emit()
+  }
+
+  /** El corte del proyecto: el modelo como un sólido, y cada pieza de soporte como otro. */
+  private realLayer(layer: number, layers: number, h: number) {
+    const r = this.real!
+    const t = performance.now()
+    let { seg, count } = slice(r.placed, h, this.sliceSeg)
+    const ranges: [number, number][] = [[0, count]]
+    const sm = { vertices: r.sup.vertices, triangles: r.sup.triangles }
+    for (const pr of r.sup.prims) {
+      if (pr.zmin > h || pr.zmax < h) continue
+      const from = count
+      ;({ seg, count } = slice(sm, h, seg, pr.t0, pr.t1, count))
+      if (count > from) ranges.push([from, count])
+    }
+    this.sliceSeg = seg
+    const sliceMs = performance.now() - t
+
+    const cg = this.plateContour!.geometry
+    let arr = (cg.getAttribute("position") as THREE.BufferAttribute).array as Float32Array
+    if (count * 6 > arr.length) {
+      arr = new Float32Array(count * 6 * 2)
+      cg.setAttribute("position", new THREE.BufferAttribute(arr, 3))
+    }
+    for (let i = 0; i < count; i++) {
+      arr[i * 6] = seg[i * 4]; arr[i * 6 + 1] = seg[i * 4 + 1]; arr[i * 6 + 2] = h
+      arr[i * 6 + 3] = seg[i * 4 + 2]; arr[i * 6 + 4] = seg[i * 4 + 3]; arr[i * 6 + 5] = h
+    }
+    ;(cg.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true
+    cg.setDrawRange(0, count * 2)
+
+    const c = this.layerCanvas
+    if (c) {
+      const pb = bounds(r.placed.vertices)
+      const pad = 1
+      const x0 = Math.min(pb.min[0], r.sup.min[0]) - pad, y0 = Math.min(pb.min[1], r.sup.min[1]) - pad
+      const x1 = Math.max(pb.max[0], r.sup.max[0]) + pad, y1 = Math.max(pb.max[1], r.sup.max[1]) + pad
+      const px = 0.05
+      const W = Math.ceil((x1 - x0) / px), H = Math.ceil((y1 - y0) / px)
+      if (c.width !== W || c.height !== H) {
+        c.width = W
+        c.height = H
+        this.layerImg = undefined
+      }
+      const ctx = c.getContext("2d")!
+      this.layerImg ??= ctx.createImageData(W, H)
+      clearLayer(this.layerImg)
+      for (const [a, b] of ranges) fillLayer(seg, a, b, this.layerImg, x0, y0, px, [235, 238, 240])
+      ctx.putImageData(this.layerImg, 0, 0)
+    }
     Object.assign(this.stats, { layer, layers, layerZ: h, segments: count, sliceMs })
     this.emit()
   }

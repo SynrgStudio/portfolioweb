@@ -207,13 +207,13 @@ export function supportTips(mesh: Mesh, b: Bounds, spacing = 1.6, angle = 50): T
  * El corte de la malla a la altura `z`: segmentos x1, y1, x2, y2 (en mm). Cada triángulo que la
  * cruza da uno. Es lo primero que hace un slicer con cada capa.
  */
-export function slice(mesh: Mesh, z: number, out?: Float32Array): { seg: Float32Array; count: number } {
+export function slice(mesh: Mesh, z: number, out?: Float32Array, from = 0, to = -1, at = 0): { seg: Float32Array; count: number } {
   const T = mesh.triangles
   const V = mesh.vertices
-  const n = T.length / 3
+  const n = to < 0 ? T.length / 3 : to
   let seg = out ?? new Float32Array(4096)
-  let k = 0
-  for (let t = 0; t < n; t++) {
+  let k = at * 4 // se puede seguir agregando a segmentos que ya están
+  for (let t = from; t < n; t++) {
     const i0 = T[t * 3] * 3, i1 = T[t * 3 + 1] * 3, i2 = T[t * 3 + 2] * 3
     const z0 = V[i0 + 2], z1 = V[i1 + 2], z2 = V[i2 + 2]
     if ((z0 < z && z1 < z && z2 < z) || (z0 >= z && z1 >= z && z2 >= z)) continue
@@ -286,6 +286,48 @@ export function rasterize(
       for (let c = Math.floor(cx - rr); c <= Math.ceil(cx + rr); c++) {
         if (c < 0 || c >= W) continue
         if ((c - cx) ** 2 + (r - cy) ** 2 > rr * rr) continue
+        const o = (r * W + c) * 4
+        data[o] = color[0]; data[o + 1] = color[1]; data[o + 2] = color[2]
+      }
+    }
+  }
+}
+
+/** Pone la capa en negro. */
+export function clearLayer(img: ImageData) {
+  const d = img.data
+  d.fill(0)
+  for (let i = 3; i < d.length; i += 4) d[i] = 255
+}
+
+/**
+ * Enciende los píxeles adentro de los segmentos [from, to) por paridad de cruces. Cada sólido se
+ * pinta por separado, así dos que se tocan suman en vez de anularse.
+ */
+export function fillLayer(seg: Float32Array, from: number, to: number, img: ImageData, x0: number, y0: number, px: number, color: [number, number, number]) {
+  const { width: W, height: H, data } = img
+  let ymin = Infinity, ymax = -Infinity
+  for (let s = from; s < to; s++) {
+    ymin = Math.min(ymin, seg[s * 4 + 1], seg[s * 4 + 3])
+    ymax = Math.max(ymax, seg[s * 4 + 1], seg[s * 4 + 3])
+  }
+  const r0 = Math.max(0, Math.floor(H - 1 - (ymax - y0) / px - 1))
+  const r1 = Math.min(H - 1, Math.ceil(H - 1 - (ymin - y0) / px + 1))
+  const xs: number[] = []
+  for (let r = r0; r <= r1; r++) {
+    const y = y0 + (H - 1 - r + 0.5) * px
+    xs.length = 0
+    for (let s = from; s < to; s++) {
+      const ay = seg[s * 4 + 1], by = seg[s * 4 + 3]
+      if (ay < y === by < y) continue
+      const ax = seg[s * 4], bx = seg[s * 4 + 2]
+      xs.push(ax + ((y - ay) / (by - ay)) * (bx - ax))
+    }
+    xs.sort((a, b) => a - b)
+    for (let i = 0; i + 1 < xs.length; i += 2) {
+      const c0 = Math.max(0, Math.ceil((xs[i] - x0) / px - 0.5))
+      const c1 = Math.min(W - 1, Math.floor((xs[i + 1] - x0) / px - 0.5))
+      for (let c = c0; c <= c1; c++) {
         const o = (r * W + c) * 4
         data[o] = color[0]; data[o + 1] = color[1]; data[o + 2] = color[2]
       }

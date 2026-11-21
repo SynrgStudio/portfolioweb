@@ -51,6 +51,8 @@ type Copy = {
     layerSub: (z: string, seg: string, ms: string) => string
     idle: string
     note: string
+    real: (c: { bases: string; trunks: string; branches: string; leaves: string; braces: string; tips: string }) => string
+    rebuilt: (ms: string, tri: string) => string
     facts: [string, string][]
   }
   loop: {
@@ -127,8 +129,8 @@ export const copy: Record<Lang, Copy> = {
         waiting: "measuring…",
       },
       smaller: (x) => `${x}× smaller, and the same model`,
-      chunks: "Chunks in this file",
-      slicer: "What a slicer adds to the same file: supports (SUPP), hollows (HOLW), a support preview (SPRV), what each part is (ROLE) and who made it (META).",
+      chunks: "Chunks in this project, as Breadslicer saved it",
+      slicer: "THMB is the thumbnail, SCNE the scene with the model's place on the plate, PROJ the printer and the resin, SUPP every support as data, MESH the model. A file can also carry hollows (HOLW), a support preview (SPRV), what each part is (ROLE) and who made it (META).",
       facts: [
         [`${FACTS.mz4250Ratio}×`, `smaller than STL over ${FACTS.mz4250Models.toLocaleString("en-US")} public miniatures, ${FACTS.mz4250Stl} GB to ${FACTS.mz4250Bread} GB`],
         ["0 bits", "lost: every one of them came back exactly"],
@@ -138,12 +140,14 @@ export const copy: Record<Lang, Copy> = {
     slicer: {
       kicker: "03 · Breadslicer",
       title: "Finally, slice it.",
-      body: "Breadslicer lifts the model off the plate, grows supports under everything that hangs, and cuts it into the layers your printer's screen will light, one by one. The project is saved as .bread, with its supports and hollows still editable.",
-      steps: ["Lift", "Support", "Slice"],
+      body: "Breadslicer turns the model the way it prints best, lifts it off the plate and grows supports under everything that hangs. Then it cuts it into the layers your printer's screen will light, one by one.",
+      steps: ["Orient", "Support", "Slice"],
       layer: (n, total) => `Layer ${n} of ${total}`,
       layerSub: (z, seg, ms) => `z = ${z} mm · ${seg} edges cut in ${ms}, here`,
       idle: "The layer appears here when the cut starts.",
       note: "Layers are cut live from the real mesh, 0.05 mm each, 50 µm per pixel. The supports are a sketch computed here from the faces that look down; Breadslicer's generator does much more.",
+      real: (c) => `This is the project as Breadslicer saved it: the turn, the lift and every support come from its .bread file. Supports are kept as data, never as a mesh: ${c.bases} bases, ${c.trunks} trunks, ${c.branches} branches, ${c.leaves} leaves, ${c.braces} braces and ${c.tips} tips, rebuilt here piece by piece. Every layer is cut live, 0.05 mm each, 50 µm per pixel.`,
+      rebuilt: (ms, tri) => `supports rebuilt from SUPP in ${ms}, ${tri} triangles`,
       facts: [
         ["0.66 s", "to slice 991 layers of a 1.9 M-triangle miniature, with supports"],
         ["0.65 s", "to review a large hollow model for islands and suction cups, from 58 s"],
@@ -185,7 +189,7 @@ export const copy: Record<Lang, Copy> = {
       bread: { kind: "Format · Apache-2.0", body: "The specification, version 2, the conformance files and the reference implementation.", cta: "bread.synrgs.tech" },
       slicer: { kind: "Slicer · alpha", body: "The resin slicer, free software. The first alpha for Windows is out.", cta: "breadslicer.app" },
     },
-    credit: "The model: Death Knight, by MZ4250, under CC BY 4.0, unchanged. Every coordinate is the STL's, bit for bit.",
+    credit: "The model: Death Knight, by MZ4250, under CC BY 4.0, unchanged: every coordinate is the STL's, bit for bit. The project around it, its orientation, supports and printer, was made in Breadslicer.",
   },
   es: {
     meta: {
@@ -236,8 +240,8 @@ export const copy: Record<Lang, Copy> = {
         waiting: "midiendo…",
       },
       smaller: (x) => `${x} veces más chico, y el mismo modelo`,
-      chunks: "Chunks de este archivo",
-      slicer: "Lo que un slicer le suma al mismo archivo: soportes (SUPP), ahuecados (HOLW), una vista previa de los soportes (SPRV), qué es cada parte (ROLE) y quién lo hizo (META).",
+      chunks: "Chunks de este proyecto, como lo guardó Breadslicer",
+      slicer: "THMB es la miniatura, SCNE la escena con el lugar del modelo en la placa, PROJ la impresora y la resina, SUPP cada soporte como datos, MESH el modelo. Un archivo también puede llevar ahuecados (HOLW), una vista previa de los soportes (SPRV), qué es cada parte (ROLE) y quién lo hizo (META).",
       facts: [
         [`${FACTS.mz4250Ratio}×`, `más chico que el STL en ${FACTS.mz4250Models.toLocaleString("es-AR")} miniaturas públicas, de ${FACTS.mz4250Stl} GB a ${String(FACTS.mz4250Bread).replace(".", ",")} GB`],
         ["0 bits", "perdidos: cada una volvió exactamente igual"],
@@ -247,12 +251,14 @@ export const copy: Record<Lang, Copy> = {
     slicer: {
       kicker: "03 · Breadslicer",
       title: "Por último, cortarlo.",
-      body: "Breadslicer levanta el modelo de la placa, le pone soportes debajo de todo lo que cuelga y lo corta en las capas que va a encender la pantalla de tu impresora, una por una. El proyecto se guarda como .bread, con los soportes y los ahuecados todavía editables.",
-      steps: ["Levantar", "Soportes", "Cortar"],
+      body: "Breadslicer gira el modelo como mejor se imprime, lo levanta de la placa y le pone soportes debajo de todo lo que cuelga. Después lo corta en las capas que va a encender la pantalla de tu impresora, una por una.",
+      steps: ["Orientar", "Soportes", "Cortar"],
       layer: (n, total) => `Capa ${n} de ${total}`,
       layerSub: (z, seg, ms) => `z = ${z} mm · ${seg} bordes cortados en ${ms}, acá`,
       idle: "La capa aparece acá cuando empieza el corte.",
       note: "Las capas se cortan en vivo de la malla real, de 0,05 mm cada una, a 50 µm por píxel. Los soportes son un boceto calculado acá a partir de las caras que miran hacia abajo; el generador de Breadslicer hace mucho más.",
+      real: (c) => `Este es el proyecto tal como lo guardó Breadslicer: el giro, la altura y cada soporte salen de su archivo .bread. Los soportes se guardan como datos, nunca como malla: ${c.bases} bases, ${c.trunks} troncos, ${c.branches} ramas, ${c.leaves} hojas, ${c.braces} riostras y ${c.tips} puntas, rearmados acá pieza por pieza. Cada capa se corta en vivo, de 0,05 mm, a 50 µm por píxel.`,
+      rebuilt: (ms, tri) => `soportes rearmados desde SUPP en ${ms}, ${tri} triángulos`,
       facts: [
         ["0,66 s", "para cortar 991 capas de una miniatura de 1,9 M de triángulos, con soportes"],
         ["0,65 s", "para revisar islas y ventosas de un modelo hueco grande, antes 58 s"],
@@ -294,6 +300,6 @@ export const copy: Record<Lang, Copy> = {
       bread: { kind: "Formato · Apache-2.0", body: "La especificación, versión 2, los archivos de conformidad y la implementación de referencia.", cta: "bread.synrgs.tech" },
       slicer: { kind: "Slicer · alfa", body: "El slicer de resina, software libre. Ya salió la primera alfa para Windows.", cta: "breadslicer.app" },
     },
-    credit: "El modelo: Death Knight, de MZ4250, bajo CC BY 4.0, sin cambios. Cada coordenada es la del STL, bit a bit.",
+    credit: "El modelo: Death Knight, de MZ4250, bajo CC BY 4.0, sin cambios: cada coordenada es la del STL, bit a bit. El proyecto alrededor, su orientación, sus soportes y su impresora, se hizo en Breadslicer.",
   },
 }

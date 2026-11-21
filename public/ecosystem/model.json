@@ -4,9 +4,21 @@
   "site": "https://mz4250.com/",
   "license": "CC BY 4.0",
   "license_url": "https://creativecommons.org/licenses/by/4.0/",
-  "changes": "None: the mesh is the STL's, every coordinate bit for bit.",
+  "changes": "None to the model: every coordinate is the STL's, bit for bit. The file is a Breadslicer project around it: orientation, supports and printer.",
+  "chunks": [
+    "THMB",
+    "SCNE",
+    "PROJ",
+    "SUPP",
+    "MESH",
+    "MESH"
+  ],
   "stl_bytes": 24691184,
-  "bread_bytes": 1822618,
+  "bread_bytes": 1922485,
   "triangles": 493822,
-  "vertices": 245332
+  "vertices": 245332,
+  "supports": {
+    "generator": "df",
+    "version": 2
+  }
 }
