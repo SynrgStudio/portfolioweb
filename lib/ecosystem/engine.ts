@@ -37,6 +37,7 @@ export type Stats = {
 
 const LIFT = 5 // mm: Breadslicer levanta 5 mm un modelo que apoya en la placa
 const LAYER = 0.05 // mm
+const STL_CUBE = 30 // mm: el lado del cubo del STL; el del .bread sale de los bytes medidos
 const C = {
   model: new THREE.Color("#c4bcae"),
   flipped: new THREE.Color("#a96bff"),
@@ -96,6 +97,10 @@ export class Engine {
   private supports?: { trunks: THREE.InstancedMesh; cones: THREE.InstancedMesh; balls: THREE.InstancedMesh; raft: THREE.Mesh }
   private plate?: THREE.Group
   private cubes?: THREE.Group
+  private cubeCenter = new THREE.Vector3() // en coordenadas del archivo
+  private small = 1 / Math.cbrt(13.5) // lado del cubo .bread sobre el del STL, hasta medirlo
+  private labels: { stl?: HTMLElement; bread?: HTMLElement; verify?: HTMLElement } = {}
+  private lastScan = -1
 
   private S = 0
   private k = 1 // la altura del modelo sobre 50 mm: la cámara se aleja en proporción
@@ -130,6 +135,11 @@ export class Engine {
     }
     this.scene.add(this.group)
     this.lights()
+  }
+
+  /** Etiquetas HTML que siguen a los cubos y a la línea de verificación. */
+  setLabels(l: { stl?: HTMLElement | null; bread?: HTMLElement | null; verify?: HTMLElement | null }) {
+    this.labels = { stl: l.stl ?? undefined, bread: l.bread ?? undefined, verify: l.verify ?? undefined }
   }
 
   setLayerCanvas(c: HTMLCanvasElement | null) {
@@ -328,9 +338,9 @@ export class Engine {
     const seed = new Float32Array(n * 3)
     const cube = new Float32Array(n * 3)
     const side = Math.ceil(Math.cbrt(n))
-    const ratio = 23.8 // se corrige cuando llega el tamaño medido
-    const L = 34 / Math.cbrt(ratio)
+    const L = STL_CUBE
     const c = [(b.min[0] + b.max[0]) / 2, (b.min[1] + b.max[1]) / 2, b.min[2] + (b.max[2] - b.min[2]) * 0.5]
+    this.cubeCenter.set(c[0], c[1], c[2])
     for (let i = 0; i < n; i++) {
       // dirección al azar, para que los vértices lleguen desde lejos
       const u = Math.random() * 2 - 1
@@ -361,12 +371,18 @@ export class Engine {
         uColor: { value: C.bread.clone() },
         uTime: { value: 0 },
         uPx: { value: 1 },
+        uSqueeze: { value: 0 },
+        uSmall: { value: this.small },
+        uCenter: { value: this.cubeCenter },
+        uScanZ: { value: -1e9 },
       },
       vertexShader: /* glsl */ `
         attribute vec3 aSeed;
         attribute vec3 aCube;
-        uniform float uScatter, uCube, uSize, uTime, uPx;
+        uniform float uScatter, uCube, uSize, uTime, uPx, uSqueeze, uSmall;
+        uniform vec3 uCenter;
         varying float vFade;
+        varying float vZ;
         void main() {
           float k = fract(sin(dot(aSeed.xy, vec2(12.9898, 78.233))) * 43758.5453);
           float s = clamp(uScatter * 1.25 - k * 0.25, 0.0, 1.0);
@@ -374,7 +390,9 @@ export class Engine {
           vec3 p = mix(position, position + aSeed, s);
           float c = clamp(uCube * 1.3 - k * 0.3, 0.0, 1.0);
           c = c * c * (3.0 - 2.0 * c);
-          p = mix(p, aCube, c);
+          vec3 target = uCenter + (aCube - uCenter) * mix(1.0, uSmall, uSqueeze);
+          p = mix(p, target, c);
+          vZ = position.z;
           vec4 mv = modelViewMatrix * vec4(p, 1.0);
           gl_Position = projectionMatrix * mv;
           gl_PointSize = uSize * uPx * (90.0 / -mv.z);
@@ -383,8 +401,11 @@ export class Engine {
       fragmentShader: /* glsl */ `
         uniform vec3 uColor;
         uniform float uOpacity;
+        uniform float uScanZ;
         varying float vFade;
+        varying float vZ;
         void main() {
+          if (vZ < uScanZ) discard; // lo que la verificación ya pasó es sólido
           vec2 d = gl_PointCoord - 0.5;
           float r = dot(d, d);
           if (r > 0.25) discard;
@@ -408,19 +429,20 @@ export class Engine {
       this.cubes!.add(e)
       return e
     }
-    box(34, new THREE.Color("#83878b"), 0.55).name = "stl"
-    box(34 / Math.cbrt(23.8), C.bread, 0.9).name = "bread"
+    box(STL_CUBE, new THREE.Color("#9aa0a6"), 0.6).name = "stl"
+    box(STL_CUBE, C.bread, 0.95).name = "bread"
     this.cubes.visible = false
     this.lifted.add(this.cubes)
   }
 
-  /** Corrige el cubo del .bread con los bytes medidos. */
+  /** El cubo del .bread, con el volumen proporcional a los bytes medidos. */
   private fixCubes() {
-    const s = this.stats
-    if (!this.cubes || !s.stlBytes || !s.breadBytes) return
-    const side = 34 / Math.cbrt(s.stlBytes / s.breadBytes)
-    const bread = this.cubes.getObjectByName("bread") as THREE.LineSegments
-    bread.scale.setScalar(side / (34 / Math.cbrt(23.8)))
+    const st = this.stats
+    const bread = st.writeBytes ?? st.breadBytes
+    const stl = st.stlBytes ?? (st.triangles ? 84 + st.triangles * 50 : undefined)
+    if (stl && bread) this.small = 1 / Math.cbrt(stl / bread)
+    this.pointsMat!.uniforms.uSmall.value = this.small
+    ;(this.cubes!.getObjectByName("bread") as THREE.LineSegments).scale.setScalar(this.small)
   }
 
   private buildPlate() {
@@ -562,17 +584,28 @@ export class Engine {
     const pm = this.pointsMat!
     pm.uniforms.uPx.value = this.renderer!.getPixelRatio()
 
-    // .bread: superficie → puntos → cubo → modelo
+    // .bread, en cuatro fases que el panel de la izquierda sigue:
+    //   STL: la superficie se deshace en vértices que llenan un cubo del tamaño del STL
+    //   .bread: el cubo se aprieta al tamaño del .bread medido
+    //   leer: los vértices vuelven al modelo
+    //   comparar: una línea verde sube y lo que pasó queda sólido
     const br = at(2)
-    const toPoints = smooth(0.08, 0.3, br) * (1 - smooth(0.78, 0.95, br))
-    const toCube = smooth(0.32, 0.5, br) * (1 - smooth(0.6, 0.78, br))
+    const toPoints = smooth(0.05, 0.18, br) * (1 - smooth(0.9, 0.97, br))
+    const toCube = smooth(0.2, 0.36, br) * (1 - smooth(0.56, 0.7, br))
+    const squeeze = br < 0.72 ? smooth(0.38, 0.52, br) : 0
+    const verifying = ch === 2 && br > 0.7 && br < 0.985
+    const H0 = this.b!.max[2] - this.b!.min[2]
+    const scanH = smooth(0.72, 0.92, br) * H0
     pm.uniforms.uScatter.value = 1 - smooth(0, 0.85, intro)
     pm.uniforms.uCube.value = toCube
+    pm.uniforms.uSqueeze.value = squeeze
+    pm.uniforms.uScanZ.value = verifying ? this.b!.min[2] + scanH : -1e9
     const pointsOn = Math.max(1 - smooth(0.7, 1, intro), toPoints)
     pm.uniforms.uOpacity.value = pointsOn * 0.75
     pm.uniforms.uColor.value.copy(ch >= 2 ? C.bread : C.model)
     this.points!.visible = pointsOn > 0.01
-    const surf = smooth(0.55, 1, intro) * (1 - toPoints)
+    const surfIn = smooth(0.55, 1, intro)
+    const surf = verifying ? surfIn : surfIn * (1 - toPoints)
     for (const m of [this.mats.model!, this.mats.flipped!, this.mats.hole!]) {
       m.opacity = surf
       m.depthWrite = surf > 0.98
@@ -580,7 +613,12 @@ export class Engine {
     }
     this.fixCubes()
     this.cubes!.visible = toCube > 0.01
-    this.cubes!.children.forEach((c) => (((c as THREE.LineSegments).material as THREE.LineBasicMaterial).opacity = (c.userData.base as number) * toCube))
+    const stlBox = this.cubes!.getObjectByName("stl") as THREE.LineSegments
+    const breadBox = this.cubes!.getObjectByName("bread") as THREE.LineSegments
+    ;(stlBox.material as THREE.LineBasicMaterial).opacity = (stlBox.userData.base as number) * toCube * (1 - 0.55 * squeeze)
+    ;(breadBox.material as THREE.LineBasicMaterial).opacity = (breadBox.userData.base as number) * toCube * squeeze
+    this.placeLabels(toCube * (1 - 0.5 * squeeze), toCube * squeeze, verifying ? smooth(0.72, 0.76, br) * (1 - smooth(0.93, 0.98, br)) : 0, scanH)
+    this.updateScan(verifying, scanH)
 
     // Caliper: el daño aparece y se repara
     const cal = at(1)
@@ -617,7 +655,7 @@ export class Engine {
     const cut = ch === 3 ? smooth(0.46, 0.94, bs) : 0
     const slicing = ch === 3 && bs > 0.44 && bs < 0.985
     const h = slicing ? Math.max(LAYER, cut * top) : 1e4
-    this.clip.constant = h
+    this.clip.constant = verifying ? scanH : h
     this.ghostClip.constant = -h
     this.ghost!.visible = slicing
     this.mats.ghost!.opacity = slicing ? 0.06 : 0
@@ -625,8 +663,58 @@ export class Engine {
     this.updateLayer(slicing, h, top)
 
     // en la cadena queda de fondo, y antes de lo medido se apaga
-    const fade = (1 - smooth(4.72, 5.02, S)) * (1 - 0.62 * smooth(3.86, 4.1, S))
+    const fade = (1 - smooth(4.72, 5.02, S)) * (1 - 0.78 * smooth(3.86, 4.1, S))
     this.canvas.style.opacity = String(fade)
+  }
+
+  private placeLabels(stlOn: number, breadOn: number, verifyOn: number, scanH: number) {
+    const w = this.canvas.clientWidth, h = this.canvas.clientHeight
+    const put = (el: HTMLElement | undefined, local: THREE.Vector3, on: number) => {
+      if (!el) return
+      el.style.opacity = String(on)
+      if (on < 0.01) return
+      const v = this.lifted.localToWorld(local.clone()).project(this.camera)
+      // siempre adentro de la pantalla: si no entra a la derecha, se corre hacia adentro
+      const x = Math.min(((v.x + 1) / 2) * w, w - el.offsetWidth - 16)
+      el.style.transform = `translate(${x}px, ${((1 - v.y) / 2) * h}px)`
+    }
+    const c = this.cubeCenter
+    const half = STL_CUBE / 2
+    put(this.labels.stl, new THREE.Vector3(c.x + half, c.y, c.z + half), stlOn)
+    put(this.labels.bread, new THREE.Vector3(c.x + half * this.small, c.y, c.z + half * this.small), breadOn)
+    put(this.labels.verify, new THREE.Vector3(this.b!.max[0], c.y, this.b!.min[2] + scanH), verifyOn)
+  }
+
+  /** La verificación: el corte real de la malla a la altura de la línea, en verde. */
+  private updateScan(on: boolean, scanH: number) {
+    const q = on ? Math.round(scanH / 0.15) : -1
+    if (q === this.lastScan) return
+    this.lastScan = q
+    if (!on) {
+      if (this.lastLayer <= 0) this.contour!.geometry.setDrawRange(0, 0)
+      ;(this.contour!.material as THREE.LineBasicMaterial).color.copy(C.amber)
+      return
+    }
+    ;(this.contour!.material as THREE.LineBasicMaterial).color.set("#7bd88f")
+    this.drawContour(this.b!.min[2] + scanH)
+  }
+
+  private drawContour(z: number) {
+    const { seg, count } = slice(this.mesh!, z, this.sliceSeg)
+    this.sliceSeg = seg
+    const cg = this.contour!.geometry
+    let arr = (cg.getAttribute("position") as THREE.BufferAttribute).array as Float32Array
+    if (count * 6 > arr.length) {
+      arr = new Float32Array(count * 6 * 2)
+      cg.setAttribute("position", new THREE.BufferAttribute(arr, 3))
+    }
+    for (let i = 0; i < count; i++) {
+      arr[i * 6] = seg[i * 4]; arr[i * 6 + 1] = seg[i * 4 + 1]; arr[i * 6 + 2] = z
+      arr[i * 6 + 3] = seg[i * 4 + 2]; arr[i * 6 + 4] = seg[i * 4 + 3]; arr[i * 6 + 5] = z
+    }
+    ;(cg.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true
+    cg.setDrawRange(0, count * 2)
+    return { seg, count }
   }
 
   private updateLayer(slicing: boolean, h: number, top: number) {
@@ -642,6 +730,7 @@ export class Engine {
       return
     }
     // en coordenadas del archivo: la altura del plano menos lo que se levantó
+    ;(this.contour!.material as THREE.LineBasicMaterial).color.copy(C.amber)
     const z = this.b!.min[2] + (h - LIFT)
     const t = performance.now()
     const { seg, count } = slice(this.mesh!, z, this.sliceSeg)

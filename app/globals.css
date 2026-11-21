@@ -299,3 +299,12 @@ body {
   html { scroll-behavior: auto; }
   .bar { animation: none; }
 }
+
+/* /ecosystem: en el celular, el texto de cada capítulo se apoya en un fondo que se funde con la
+   escena arriba y abajo; en pantallas anchas lo da un degradado lateral. */
+.scrim {
+  background: linear-gradient(180deg, rgba(17, 18, 20, 0) 0, rgba(17, 18, 20, 0.9) 3.5rem, rgba(17, 18, 20, 0.94) calc(100% - 3rem), rgba(17, 18, 20, 0) 100%);
+}
+@media (min-width: 1024px) {
+  .scrim { background: none; }
+}

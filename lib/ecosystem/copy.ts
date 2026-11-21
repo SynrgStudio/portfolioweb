@@ -34,7 +34,9 @@ type Copy = {
     kicker: string
     title: string
     body: string
+    steps: [string, string, string, string]
     live: { stl: string; write: string; read: string; compare: string; identical: (n: string) => string; differ: (n: string) => string; waiting: string }
+    labels: { stl: (mb: string) => string; bread: (mb: string, x: string) => string; verify: (n: string) => string; verifying: string }
     smaller: (x: string) => string
     chunks: string
     slicer: string
@@ -108,6 +110,13 @@ export const copy: Record<Lang, Copy> = {
       kicker: "02 · .bread",
       title: "Then, pack it without losing a bit.",
       body: "An STL writes every corner again for every triangle that touches it. .bread stores each vertex once, predicts it from its neighbours, and keeps all 32 bits of every coordinate. Your browser just did it, with the format's own WebAssembly module:",
+      steps: ["STL", ".bread", "Read back", "Compare"],
+      labels: {
+        stl: (mb) => `STL · ${mb}`,
+        bread: (mb, x) => `.bread · ${mb} · ${x}× smaller`,
+        verify: (n) => `✓ ${n} corners identical`,
+        verifying: "comparing every corner…",
+      },
       live: {
         stl: "STL rebuilt from the mesh",
         write: ".bread written",
@@ -210,6 +219,13 @@ export const copy: Record<Lang, Copy> = {
       kicker: "02 · .bread",
       title: "Después, guardarlo sin perder un bit.",
       body: "Un STL vuelve a escribir cada esquina por cada triángulo que la toca. .bread guarda cada vértice una vez, lo predice a partir de sus vecinos y conserva los 32 bits de cada coordenada. Tu navegador acaba de hacerlo, con el módulo de WebAssembly del propio formato:",
+      steps: ["STL", ".bread", "Leer", "Comparar"],
+      labels: {
+        stl: (mb) => `STL · ${mb}`,
+        bread: (mb, x) => `.bread · ${mb} · ${x} veces más chico`,
+        verify: (n) => `✓ ${n} esquinas idénticas`,
+        verifying: "comparando cada esquina…",
+      },
       live: {
         stl: "STL rearmado desde la malla",
         write: ".bread escrito",

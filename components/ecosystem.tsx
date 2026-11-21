@@ -19,6 +19,9 @@ export default function Ecosystem() {
   const t = COPY[lang]
   const canvas = useRef<HTMLCanvasElement>(null)
   const layer = useRef<HTMLCanvasElement>(null)
+  const lStl = useRef<HTMLDivElement>(null)
+  const lBread = useRef<HTMLDivElement>(null)
+  const lVerify = useRef<HTMLDivElement>(null)
   const sections = useRef<(HTMLElement | null)[]>([])
   const engine = useRef<Engine | null>(null)
   const [stats, setStats] = useState<Stats>({})
@@ -41,6 +44,7 @@ export default function Ecosystem() {
       e.onStats = (s) => setStats(s)
       e.onReady = () => setReady(true)
       e.setLayerCanvas(layer.current)
+      e.setLabels({ stl: lStl.current, bread: lBread.current, verify: lVerify.current })
       e.load("/ecosystem").catch(() => setStats((s) => ({ ...s, webgl: false })))
     })
     return () => {
@@ -86,6 +90,7 @@ export default function Ecosystem() {
   const bs = at(3)
   const calStep = cal < 0.5 ? 0 : cal < 0.8 ? 1 : 2
   const bsStep = bs < 0.14 ? 0 : bs < 0.44 ? 1 : 2
+  const brStep = br < 0.38 ? 0 : br < 0.56 ? 1 : br < 0.72 ? 2 : 3
   const d = stats.damaged
   const repaired = cal >= 0.8
   const ratio = stats.stlBytes && stats.writeBytes ? stats.stlBytes / stats.writeBytes : undefined
@@ -103,6 +108,9 @@ export default function Ecosystem() {
         <div className="absolute inset-0" style={{ background: "radial-gradient(60% 70% at 66% 45%, rgba(215,167,90,.10), transparent 70%), radial-gradient(40% 50% at 20% 90%, rgba(246,138,59,.06), transparent 70%)" }} />
         <canvas ref={canvas} className="absolute inset-0 h-full w-full transition-opacity duration-700" style={{ opacity: ready ? 1 : 0 }} />
         <div className="absolute inset-x-0 bottom-0 h-40" style={{ background: "linear-gradient(transparent, #111214)" }} />
+        <SceneLabel refEl={lStl} tone="#c9ced2">{t.bread.labels.stl(mb(stats.stlBytes ?? (stats.triangles ? 84 + stats.triangles * 50 : undefined)))}</SceneLabel>
+        <SceneLabel refEl={lBread} tone={TONE.bread}>{t.bread.labels.bread(mb(stats.writeBytes ?? stats.breadBytes), ratioText)}</SceneLabel>
+        <SceneLabel refEl={lVerify} tone="#7bd88f">{stats.mismatches === 0 ? t.bread.labels.verify(n(stats.corners)) : t.bread.labels.verifying}</SceneLabel>
       </div>
 
       {/* ------------------------------------------------------------- 0 · portada */}
@@ -153,19 +161,21 @@ export default function Ecosystem() {
 
       {/* ------------------------------------------------------------- 2 · .bread */}
       <Chapter refFn={sec(2)} vh={CHAPTERS[2]} tone={TONE.bread} kicker={t.bread.kicker} title={t.bread.title} body={t.bread.body}>
+        <Steps steps={t.bread.steps} active={brStep} tone={TONE.bread} />
         <Panel tone={TONE.bread}>
           <div className="grid gap-3 font-mono text-[13px]">
-            <Live label={t.bread.live.stl} value={mb(stats.stlBytes)} sub={ms(stats.stlMs)} on={br > 0.05} />
-            <Live label={t.bread.live.write} value={mb(stats.writeBytes)} sub={ms(stats.writeMs)} on={br > 0.2} tone={TONE.bread} />
-            <Live label={t.bread.live.read} value={ms(stats.readMs)} on={br > 0.45} />
+            <Live label={t.bread.live.stl} value={mb(stats.stlBytes)} sub={ms(stats.stlMs)} on={brStep >= 0} now={brStep === 0} />
+            <Live label={t.bread.live.write} value={mb(stats.writeBytes)} sub={ms(stats.writeMs)} on={brStep >= 1} now={brStep === 1} tone={TONE.bread} />
+            <Live label={t.bread.live.read} value={ms(stats.readMs)} on={brStep >= 2} now={brStep === 2} />
             <Live
               label={t.bread.live.compare}
               value={stats.mismatches === undefined ? t.bread.live.waiting : stats.mismatches === 0 ? `✓ ${t.bread.live.identical(n(stats.corners))}` : t.bread.live.differ(n(stats.mismatches))}
-              on={br > 0.7}
+              on={brStep >= 3}
+              now={brStep === 3}
               tone={stats.mismatches === 0 ? "#7bd88f" : undefined}
             />
           </div>
-          <Bars stl={stats.stlBytes} bread={stats.writeBytes} on={br > 0.3} />
+          <Bars stl={stats.stlBytes} bread={stats.writeBytes} on={br > 0.2} squeeze={brStep >= 1} />
           <p className="mt-2 text-[13px]" style={{ color: TONE.bread }}>
             {t.bread.smaller(ratioText)}
           </p>
@@ -284,9 +294,10 @@ export default function Ecosystem() {
 function Chapter({ refFn, vh, tone, kicker, title, body, children }: { refFn: (el: HTMLElement | null) => void; vh: number; tone: string; kicker: string; title: string; body: string; children: React.ReactNode }) {
   return (
     <section ref={refFn} className="relative z-10 pb-[75svh] pt-[58svh] lg:h-[var(--h)] lg:p-0" style={{ ["--h" as string]: `${vh}vh`, ["--tone" as string]: tone }}>
-      <div className="lg:sticky lg:top-0 lg:flex lg:min-h-[100svh] lg:items-center">
-        <div className="wrap">
-          <div className="max-w-[30rem] rounded-sm border border-line/70 p-5 sm:p-6 lg:border-0 lg:p-0" style={{ background: "linear-gradient(180deg, rgba(17,18,20,.88), rgba(17,18,20,.95))" }}>
+      <div className="relative lg:sticky lg:top-0 lg:flex lg:min-h-[100svh] lg:items-center">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(17,18,20,.94) 0%, rgba(17,18,20,.82) 30%, rgba(17,18,20,.35) 46%, transparent 60%)" }} />
+        <div className="wrap relative">
+          <div className="scrim max-w-[30rem] px-5 pb-8 pt-16 sm:px-6 lg:p-0">
             <p className="label" style={{ color: tone }}>{kicker}</p>
             <h2 className="display mt-3 text-[clamp(1.9rem,4.2vw,3.4rem)]">{title}</h2>
             <p className="mt-4 text-[15px] leading-relaxed text-body sm:text-base">{body}</p>
@@ -340,10 +351,10 @@ function Row({ label, value, dot, n }: { label: string; value?: number; dot: str
   )
 }
 
-function Live({ label, value, sub, on, tone }: { label: string; value: string; sub?: string; on: boolean; tone?: string }) {
+function Live({ label, value, sub, on, now, tone }: { label: string; value: string; sub?: string; on: boolean; now?: boolean; tone?: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 transition-opacity duration-500" style={{ opacity: on ? 1 : 0.3 }}>
-      <span className="text-muted">{label}</span>
+    <div className="-mx-2 flex items-baseline justify-between gap-4 px-2 py-0.5 transition-all duration-500" style={{ opacity: on ? 1 : 0.3, background: now ? "rgba(242,227,194,.07)" : "transparent", boxShadow: now ? "inset 2px 0 0 #f2e3c2" : "none" }}>
+      <span className={now ? "text-ink" : "text-muted"}>{label}</span>
       <span className="text-right tabular-nums" style={{ color: tone ?? "#f0f0ed" }}>
         {value}
         {sub && <span className="ml-2 text-faint">{sub}</span>}
@@ -353,12 +364,12 @@ function Live({ label, value, sub, on, tone }: { label: string; value: string; s
 }
 
 /** Los dos tamaños a escala: la barra del STL entera y la del .bread en proporción. */
-function Bars({ stl, bread, on }: { stl?: number; bread?: number; on: boolean }) {
+function Bars({ stl, bread, on, squeeze }: { stl?: number; bread?: number; on: boolean; squeeze: boolean }) {
   const w = stl && bread ? Math.max(0.6, (bread / stl) * 100) : 0
   return (
     <div className="mt-4 grid gap-1.5" aria-hidden="true">
       <div className="h-2 bg-[#3d4044] transition-transform duration-1000" style={{ transform: `scaleX(${on ? 1 : 0})`, transformOrigin: "left" }} />
-      <div className="h-2 transition-all duration-1000" style={{ width: on ? `${w}%` : 0, background: "#f2e3c2", boxShadow: "0 0 12px rgba(242,227,194,.7)" }} />
+      <div className="h-2 transition-all duration-1000" style={{ width: squeeze ? `${w}%` : on ? "100%" : 0, background: "#f2e3c2", boxShadow: "0 0 12px rgba(242,227,194,.7)" }} />
     </div>
   )
 }
@@ -376,6 +387,19 @@ function Facts({ facts, tone }: { facts: [string, string][]; tone: string }) {
   )
 }
 
+/** Una etiqueta que el motor ubica sobre la escena, cuadro a cuadro. */
+function SceneLabel({ refEl, tone, left, children }: { refEl: React.RefObject<HTMLDivElement | null>; tone: string; left?: boolean; children: React.ReactNode }) {
+  return (
+    <div ref={refEl} className="absolute left-0 top-0 hidden lg:block" style={{ opacity: 0, willChange: "transform" }}>
+      <div className={left ? "-translate-x-full -translate-y-1/2 pr-3" : "-translate-y-full pb-2 pl-3"}>
+        <span className={left ? "whitespace-nowrap border-r-2 bg-[#111214]/80 px-2.5 py-1 font-mono text-[12px]" : "whitespace-nowrap border-l-2 bg-[#111214]/80 px-2.5 py-1 font-mono text-[12px]"} style={{ borderColor: tone, color: tone }}>
+          {children}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 function Hud({ on, children }: { on: boolean; children: React.ReactNode }) {
   return (
     <p className="flex max-w-[34rem] items-start gap-2.5 font-mono text-xs leading-relaxed text-muted">
@@ -389,66 +413,146 @@ type LoopCopy = (typeof COPY)["en"]["loop"]
 
 /** Las tres herramientas y el formato en el medio, con lo que viaja por cada línea. */
 function Chain({ t, on }: { t: LoopCopy; on: boolean }) {
+  const [still, setStill] = useState(false)
+  useEffect(() => setStill(matchMedia("(prefers-reduced-motion: reduce)").matches), [])
   const nodes = [
-    { id: "blender", x: 90, y: 70, label: t.nodes.blender, tone: "#83878b" },
-    { id: "caliper", x: 90, y: 250, label: t.nodes.caliper, tone: TONE.caliper },
-    { id: "bread", x: 480, y: 250, label: t.nodes.bread, tone: TONE.bread, big: true },
-    { id: "slicer", x: 870, y: 250, label: t.nodes.slicer, tone: TONE.slicer },
-    { id: "printer", x: 870, y: 430, label: t.nodes.printer, tone: "#83878b" },
-    { id: "browser", x: 480, y: 430, label: t.nodes.browser, tone: "#83878b" },
+    { id: "blender", x: 90, y: 80, label: t.nodes.blender, tone: "#a3a4a6" },
+    { id: "caliper", x: 90, y: 270, label: t.nodes.caliper, tone: TONE.caliper, img: "/tools/caliper.svg" },
+    { id: "bread", x: 480, y: 270, label: t.nodes.bread, tone: TONE.bread, big: true },
+    { id: "slicer", x: 870, y: 270, label: t.nodes.slicer, tone: TONE.slicer, img: "/tools/breadslicer.png" },
+    { id: "printer", x: 870, y: 460, label: t.nodes.printer, tone: "#a3a4a6" },
+    { id: "browser", x: 480, y: 460, label: t.nodes.browser, tone: "#a3a4a6" },
   ]
   const at = (id: string) => nodes.find((x) => x.id === id)!
-  // side: dónde va la etiqueta de una línea vertical (a la derecha o a la izquierda)
+  // lo que viaja por cada línea: en su sentido (go) y al revés (back)
   const edges = [
-    { a: "blender", b: "caliper", label: t.edges.bridge, tone: TONE.caliper, side: 1 },
-    { a: "caliper", b: "bread", label: t.edges.caliper, tone: TONE.caliper, both: true },
-    { a: "bread", b: "slicer", label: t.edges.slicer, tone: TONE.slicer, both: true },
-    { a: "slicer", b: "printer", label: t.edges.printer, tone: TONE.slicer, side: -1 },
-    { a: "bread", b: "browser", label: t.edges.browser, tone: TONE.bread, side: -1 },
+    { a: "blender", b: "caliper", label: t.edges.bridge, tone: TONE.caliper, side: 1, go: ["STL"], back: ["STL"] },
+    { a: "caliper", b: "bread", label: t.edges.caliper, tone: TONE.caliper, go: ["MESH", "SCNE"], back: ["MESH"] },
+    { a: "bread", b: "slicer", label: t.edges.slicer, tone: TONE.slicer, go: ["MESH"], back: ["SUPP", "HOLW", "SPRV"] },
+    { a: "slicer", b: "printer", label: t.edges.printer, tone: TONE.slicer, side: -1, go: [".ctb"], back: [] as string[] },
+    { a: "bread", b: "browser", label: t.edges.browser, tone: TONE.bread, side: -1, go: ["SCNE", "MESH"], back: [] as string[] },
   ]
+  const ring = ["SCNE", "MESH", "THMB", "PROJ", "SUPP", "HOLW", "SPRV", "SURF", "ROLE", "META"]
+  const R = (nd: (typeof nodes)[number]) => (nd.big ? 96 : 34) // las líneas del .bread terminan afuera de su anillo
   return (
     <div className="mt-10 overflow-x-auto pb-2">
-      <svg viewBox="0 0 960 500" className="w-full min-w-[680px] max-w-[64rem]" role="img" aria-label={edges.map((e) => `${at(e.a).label} → ${at(e.b).label}: ${e.label}`).join(". ")}>
-        <style>{`.flow{stroke-dasharray:3 11;animation:flow 1.4s linear infinite}.flow.back{animation-direction:reverse}@keyframes flow{to{stroke-dashoffset:-28}}@media (prefers-reduced-motion:reduce){.flow{animation:none}}`}</style>
+      <svg viewBox="0 0 960 540" className="w-full min-w-[700px] max-w-[64rem]" role="img" aria-label={edges.map((e) => `${at(e.a).label} → ${at(e.b).label}: ${e.label}`).join(". ")}>
+        <style>{`
+          .pulse{transform-origin:480px 270px;animation:pulse 2.6s ease-out infinite}
+          @keyframes pulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
+          @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
+        `}</style>
         <defs>
-          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="6" />
+          <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="5" />
+          </filter>
+          <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.2" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
+
         {edges.map((e, i) => {
           const A = at(e.a), B = at(e.b)
           const vertical = A.x === B.x
-          const ra = A.big ? 44 : 32, rb = B.big ? 44 : 32
-          const x1 = vertical ? A.x : A.x + ra, x2 = vertical ? B.x : B.x - rb
-          const y1 = vertical ? A.y + ra : A.y, y2 = vertical ? B.y - rb : B.y
+          const x1 = vertical ? A.x : A.x + R(A), x2 = vertical ? B.x : B.x - R(B)
+          const y1 = vertical ? A.y + R(A) : A.y, y2 = vertical ? B.y - R(B) : B.y
+          const len = Math.hypot(x2 - x1, y2 - y1)
           const mx = (x1 + x2) / 2, my = (y1 + y2) / 2
+          const id = `edge-${i}`
+          const dur = len / 95
+          const packets = [...e.go.map((tag) => ({ tag, rev: false })), ...e.back.map((tag) => ({ tag, rev: true }))]
           return (
-            <g key={e.a + e.b} style={{ opacity: on ? 1 : 0, transition: `opacity .7s ${i * 0.12}s` }}>
+            <g key={id}>
+              <path id={id} d={`M${x1} ${y1} L${x2} ${y2}`} fill="none" />
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#2b2d30" strokeWidth={2} />
-              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={e.tone} strokeWidth={2} className="flow" strokeLinecap="round" />
-              {e.both && <line x1={x1} y1={y1 + 7} x2={x2} y2={y2 + 7} stroke={e.tone} strokeOpacity={0.45} strokeWidth={1.5} className="flow back" strokeLinecap="round" />}
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={e.tone}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeDasharray={len}
+                strokeDashoffset={on ? 0 : len}
+                style={{ transition: `stroke-dashoffset 1s cubic-bezier(.2,.7,.2,1) ${i * 0.18}s` }}
+                opacity={0.55}
+              />
               <text
-                x={vertical ? mx + (e.side ?? 1) * 16 : mx}
-                y={vertical ? my + 4 : my - 16}
+                x={vertical ? mx + (e.side ?? 1) * 32 : mx}
+                y={vertical ? my + 4 : my - 18}
                 textAnchor={vertical ? ((e.side ?? 1) > 0 ? "start" : "end") : "middle"}
                 fill="#a3a4a6"
-                style={{ font: "500 12.5px var(--font-mono), monospace" }}
+                style={{ font: "500 12.5px var(--font-mono), monospace", opacity: on ? 1 : 0, transition: `opacity .6s ${0.4 + i * 0.18}s` }}
               >
                 {e.label}
               </text>
+              {on &&
+                !still &&
+                packets.map(({ tag, rev }, j) => {
+                  const begin = `${1 + i * 0.18 + (j * dur) / packets.length}s`
+                  const w = tag.length * 8 + 14
+                  return (
+                    <g key={tag + j} opacity={0}>
+                      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.85;1" dur={`${dur}s`} begin={begin} repeatCount="indefinite" />
+                      <animateMotion dur={`${dur}s`} begin={begin} repeatCount="indefinite" keyPoints={rev ? "1;0" : "0;1"} keyTimes="0;1" calcMode="linear">
+                        <mpath href={`#${id}`} />
+                      </animateMotion>
+                      <circle r={8} fill={e.tone} opacity={0.35} filter="url(#glow)" />
+                      <rect x={-w / 2} y={-9} width={w} height={18} rx={3} fill="#111214" stroke={e.tone} strokeWidth={1} />
+                      <text y={4} textAnchor="middle" fill={e.tone} style={{ font: "600 10.5px var(--font-mono), monospace" }}>
+                        {tag}
+                      </text>
+                    </g>
+                  )
+                })}
             </g>
           )
         })}
+
+        {/* el .bread: el corazón, con sus chunks girando alrededor */}
+        <g style={{ opacity: on ? 1 : 0.4, transition: "opacity .8s" }}>
+          <circle cx={480} cy={270} r={46} fill={TONE.bread} opacity={0.22} filter="url(#glow)" />
+          {!still && <circle className="pulse" cx={480} cy={270} r={46} fill="none" stroke={TONE.bread} strokeWidth={1.5} />}
+          {/* los chunks orbitan sin girar: el texto siempre se lee derecho */}
+          <circle cx={480} cy={270} r={70} fill="none" stroke={TONE.bread} strokeOpacity={0.2} strokeDasharray="2 7" />
+          {ring.map((tag, i) => {
+            const a = (i / ring.length) * Math.PI * 2
+            const x = 480 + Math.cos(a) * 70
+            const y = 270 + Math.sin(a) * 70
+            return (
+              <g key={tag} transform={still ? `translate(${x} ${y})` : undefined}>
+                {!still && (
+                  <animateMotion dur="48s" begin={`-${(i / ring.length) * 48}s`} repeatCount="indefinite" path="M550 270 A70 70 0 1 1 410 270 A70 70 0 1 1 550 270" />
+                )}
+                <rect x={-17} y={-8} width={34} height={16} rx={2} fill="#111214" stroke={TONE.bread} strokeOpacity={0.45} />
+                <text y={3.5} textAnchor="middle" fill={TONE.bread} style={{ font: "600 9px var(--font-mono), monospace" }}>
+                  {tag}
+                </text>
+              </g>
+            )
+          })}
+        </g>
+
         {nodes.map((nd) => (
           <g key={nd.id} transform={`translate(${nd.x} ${nd.y})`}>
-            {nd.big && <circle r={44} fill={nd.tone} opacity={0.18} filter="url(#glow)" />}
-            <circle r={nd.big ? 44 : 32} fill="#111214" stroke={nd.tone} strokeWidth={nd.big ? 2 : 1.5} />
-            {nd.big && <circle r={58} fill="none" stroke={nd.tone} strokeOpacity={0.22} strokeDasharray="2 6" />}
-            <text y={nd.big ? 6 : 5} textAnchor="middle" fill={nd.tone} style={{ font: `700 ${nd.big ? 17 : 12}px var(--font-sans), sans-serif`, fontStretch: "125%" }}>
-              {nd.big ? ".bread" : nd.label.slice(0, 1)}
-            </text>
+            <circle r={nd.big ? 46 : R(nd)} fill="#111214" stroke={nd.tone} strokeWidth={nd.big ? 2 : 1.5} />
+            {!nd.big && <circle r={R(nd)} fill={nd.tone} opacity={0.06} />}
+            {nd.big ? (
+              <text y={6} textAnchor="middle" fill={nd.tone} style={{ font: "700 17px var(--font-sans), sans-serif", fontStretch: "125%" }}>
+                .bread
+              </text>
+            ) : nd.img ? (
+              <image href={nd.img} x={-15} y={-15} width={30} height={30} />
+            ) : (
+              <NodeIcon id={nd.id} tone={nd.tone} />
+            )}
             {!nd.big && (
-              <text y={52} textAnchor="middle" fill="#f0f0ed" style={{ font: "700 14px var(--font-sans), sans-serif", fontStretch: "125%" }}>
+              <text y={R(nd) + 22} textAnchor="middle" fill="#f0f0ed" style={{ font: "700 14px var(--font-sans), sans-serif", fontStretch: "125%" }}>
                 {nd.label}
               </text>
             )}
@@ -456,6 +560,35 @@ function Chain({ t, on }: { t: LoopCopy; on: boolean }) {
         ))}
       </svg>
     </div>
+  )
+}
+
+/** Íconos de línea para los nodos que no son nuestros: Blender, la impresora y el navegador. */
+function NodeIcon({ id, tone }: { id: string; tone: string }) {
+  const p = { fill: "none", stroke: tone, strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const }
+  if (id === "printer")
+    return (
+      <g {...p}>
+        <rect x={-12} y={-14} width={24} height={6} rx={1} />
+        <path d="M-9 -8 V8 M9 -8 V8 M-12 8 H12 V13 H-12 Z" />
+        <path d="M-5 3 h10" strokeOpacity={0.6} />
+      </g>
+    )
+  if (id === "browser")
+    return (
+      <g {...p}>
+        <rect x={-14} y={-11} width={28} height={22} rx={2} />
+        <path d="M-14 -5 H14" />
+        <circle cx={-10} cy={-8} r={0.8} fill={tone} />
+        <circle cx={-7} cy={-8} r={0.8} fill={tone} />
+      </g>
+    )
+  // Blender: un modelo, en alambre
+  return (
+    <g {...p}>
+      <path d="M0 -12 L11 -5 V7 L0 13 L-11 7 V-5 Z" />
+      <path d="M0 -12 V1 M0 1 L11 -5 M0 1 L-11 -5 M0 1 V13" strokeOpacity={0.6} />
+    </g>
   )
 }
 
