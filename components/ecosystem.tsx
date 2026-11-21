@@ -12,6 +12,8 @@ import type { Engine, Stats } from "@/lib/ecosystem/engine"
 
 const TONE = { caliper: "#f68a3b", bread: "#f2e3c2", slicer: "#d7a75a", ink: "#f0f0ed" }
 const CHAPTERS = [150, 320, 320, 360, 220, 160] // alto de cada capítulo, en vh
+// el degradado lateral se desvanece arriba y abajo: cuando el capítulo se suelta y sube, no deja un borde
+const FADE_Y = "linear-gradient(180deg, transparent 0, #000 22%, #000 78%, transparent 100%)"
 const STORE = "https://apps.microsoft.com/detail/9P7V6VGWHDST?mode=full"
 
 export default function Ecosystem() {
@@ -319,7 +321,7 @@ function Chapter({ refFn, vh, tone, kicker, title, body, children }: { refFn: (e
   return (
     <section ref={refFn} className="relative z-10 pb-[75svh] pt-[58svh] lg:h-[var(--h)] lg:p-0" style={{ ["--h" as string]: `${vh}vh`, ["--tone" as string]: tone }}>
       <div className="relative lg:sticky lg:top-0 lg:flex lg:min-h-[100svh] lg:items-center">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(17,18,20,.94) 0%, rgba(17,18,20,.82) 30%, rgba(17,18,20,.35) 46%, transparent 60%)" }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block" style={{ background: "linear-gradient(90deg, rgba(17,18,20,.94) 0%, rgba(17,18,20,.82) 30%, rgba(17,18,20,.35) 46%, transparent 60%)", WebkitMaskImage: FADE_Y, maskImage: FADE_Y }} />
         <div className="wrap relative">
           <div className="scrim max-w-[30rem] px-5 pb-8 pt-16 sm:px-6 lg:p-0">
             <p className="label" style={{ color: tone }}>{kicker}</p>
