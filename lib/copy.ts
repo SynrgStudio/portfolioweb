@@ -19,7 +19,7 @@ type ToolCopy = {
 
 export type Copy = {
   nav: { work: string; software: string; web: string; threeD: string; automation: string; method: string; why: string; contact: string }
-  hero: { title: string; body: string; work: string; method: string }
+  hero: { title: string; body: string; work: string; method: string; ecosystem: string }
   meter: {
     ready: (ms: number, requests: number, kb: number) => string
     where: string
@@ -93,6 +93,7 @@ export const copy: Record<Lang, Copy> = {
       body: "SynrgStudio makes native tools for Windows, websites, Blender add-ons and 3D models for print. Each tool is measured before it ships, and the numbers go on its page.",
       work: "See the work",
       method: "How we work",
+      ecosystem: "One model through Caliper, .bread and Breadslicer",
     },
     meter: {
       ready: (ms, requests, kb) =>
@@ -334,6 +335,7 @@ export const copy: Record<Lang, Copy> = {
       title: "Software que no te hace esperar.",
       body: "SynrgStudio hace herramientas nativas para Windows, sitios web, addons de Blender y modelos 3D para imprimir. Cada herramienta se mide antes de salir, y los números van en su página.",
       work: "Ver el trabajo",
+      ecosystem: "Un modelo por Caliper, .bread y Breadslicer",
       method: "Cómo trabajamos",
     },
     meter: {

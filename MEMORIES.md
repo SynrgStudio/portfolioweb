@@ -52,3 +52,10 @@ El estudio hace software nativo, addons de Blender y modelos 3D. Lo que tienen e
 
 - Caliper está en la Microsoft Store ("Caliper 3D", ID 9P7V6VGWHDST). `store` en `tools` (lib/copy.ts) pone el badge oficial bajo los links de la herramienta, con su texto en `t.tools.<id>.store`.
 - Los badges son los SVG oficiales de Microsoft, sin tocar: `public/tools/microsoft-store-en.svg` y `-es.svg`, elegidos por idioma. El de español está en `get.microsoft.com/images/es%20dark.svg` (`es-es` da 404). Microsoft no deja recolorearlos ni recortarlos: solo escalarlos.
+
+## /ecosystem (21 nov 2026)
+
+- Cómo se conectan Caliper, .bread y Breadslicer, contado con el scroll sobre una miniatura real. `components/ecosystem.tsx` (secciones y paneles), `lib/ecosystem/engine.ts` (la escena three.js, manejada por S = capítulo + avance), `lib/ecosystem/mesh.ts` (análisis de bordes, STL, comparación bit a bit, boceto de soportes, corte y rasterizado de capas), `lib/ecosystem/copy.ts` (textos; cada cifra fija dice de dónde sale).
+- Lo que se muestra del modelo se calcula en el navegador de quien mira, con el WebAssembly de bread-format (`lib/bread-format/index.js` y `public/ecosystem/*.wasm`, copiados de bread-format main, Apache-2.0, con su NOTICE). El daño de Caliper es una demo sobre una copia, y la página lo dice.
+- El modelo: Death Knight de MZ4250 (CC BY 4.0, sin cambios), sin soportes. `node scripts/ecosystem-model.mjs "<stl>" "<nombre>"` lo escribe como `public/ecosystem/model.bread` y comprueba cada esquina. Tiene que ser un modelo sin soportes (los pone la página).
+- Para probarla: `next build`, servir `out/` y mirar con Playwright y `--enable-unsafe-swiftshader` (WebGL sin GPU). Cerrar el servidor antes de otro build: tiene tomada `out/`.

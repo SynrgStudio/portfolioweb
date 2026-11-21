@@ -1,0 +1,12 @@
+{
+  "name": "Death Knight",
+  "creator": "MZ4250",
+  "site": "https://mz4250.com/",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "changes": "None: the mesh is the STL's, every coordinate bit for bit.",
+  "stl_bytes": 24691184,
+  "bread_bytes": 1822618,
+  "triangles": 493822,
+  "vertices": 245332
+}

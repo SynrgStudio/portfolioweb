@@ -24,6 +24,9 @@ export default function Hero() {
             <a href="#method" className="go in">
               {t.hero.method}
             </a>
+            <Link href="/ecosystem" className="go in" style={{ ["--tone" as string]: "#d7a75a" }}>
+              {t.hero.ecosystem}
+            </Link>
           </div>
         </div>
         <PageMeter />
