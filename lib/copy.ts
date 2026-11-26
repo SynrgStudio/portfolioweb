@@ -3,7 +3,7 @@
 // si allá cambian, se cambian acá.
 
 export type Lang = "en" | "es"
-export type ToolId = "breadslicer" | "seek" | "jolt" | "caliper" | "webtomd"
+export type ToolId = "breadslicer" | "seek" | "jolt" | "caliper" | "harbor" | "webtomd"
 export type SiteId = "puertorolero" | "breadslicer"
 export type AddonId = "damtools" | "bambu" | "cleaner" | "bridge"
 
@@ -31,6 +31,7 @@ export type Copy = {
   breadslicerSteps: Record<"transform" | "hollow" | "supports" | "slice" | "export", [string, string]>
   seekNote: string
   joltNote: string
+  harborNote: string
   caliperSteps: [string, string][]
   webtomd: { raw: string; clean: string; tokens: string; note: string }
   web: {
@@ -106,7 +107,7 @@ export const copy: Record<Lang, Copy> = {
     },
     software: {
       label: "Software",
-      title: "Five tools, each for one job.",
+      title: "Six tools, each for one job.",
       body: "Every figure below was taken from a real run and is published on the tool's own page.",
     },
     tools: {
@@ -139,6 +140,13 @@ export const copy: Record<Lang, Copy> = {
         meta: "Windows · Linux in Nightly · free",
         store: { note: "Or from the Microsoft Store: signed by Microsoft and kept up to date for you.", alt: "Download from the Microsoft Store" },
       },
+      harbor: {
+        kind: "Movies and series on Android",
+        body: "A native Android app for movies and TV series that works with your Stremio account: your addons, your list and what you were watching come along and go back. Its own player with gestures and picture-in-picture, downloads for offline, alerts for new episodes, and a guard on mobile data. It ships no stream addons.",
+        figure: "19.1 MB",
+        figureLabel: "the whole APK, torrent engine and FFmpeg audio included",
+        meta: "Android 10 or later · Kotlin, Compose, Rust · GPL v3",
+      },
       webtomd: {
         kind: "Markdown proxy for LLMs",
         body: "Put md.synrgs.tech/v1/ in front of any URL and get the page back as clean Markdown, without the navigation, scripts and styles a model would pay to read. The instance is private, with a key per person; the code is open, to run your own.",
@@ -156,6 +164,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "A real answer, typo included.",
     joltNote: "Split view: two panes, each with its own tabs.",
+    harborNote: "Harbor 0.7.0: Home, a series and Continue. Posters from TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Open", "Browse your STL files. The camera stays where you left it."],
       ["Inspect", "Mesh analysis runs when you ask, not on every file you open."],
@@ -287,7 +296,7 @@ export const copy: Record<Lang, Copy> = {
       rows: [
         {
           name: "It gets finished",
-          body: "Nothing here is a concept. Five tools, four add-ons and two sites are published and in use today.",
+          body: "Nothing here is a concept. Six tools, four add-ons and two sites are published and in use today.",
         },
         {
           name: "Numbers, not adjectives",
@@ -349,7 +358,7 @@ export const copy: Record<Lang, Copy> = {
     },
     software: {
       label: "Software",
-      title: "Cinco herramientas, cada una para un trabajo.",
+      title: "Seis herramientas, cada una para un trabajo.",
       body: "Cada cifra de abajo salió de una corrida real y está publicada en la página de su herramienta.",
     },
     tools: {
@@ -382,6 +391,13 @@ export const copy: Record<Lang, Copy> = {
         meta: "Windows · Linux en Nightly · gratis",
         store: { note: "O desde Microsoft Store: firmado por Microsoft y siempre actualizado.", alt: "Descargar desde Microsoft Store" },
       },
+      harbor: {
+        kind: "Películas y series en Android",
+        body: "Una app nativa de Android para películas y series que funciona con tu cuenta de Stremio: tus addons, tu lista y lo que estabas viendo vienen con ella y vuelven. Reproductor propio con gestos e imagen en imagen, descargas para ver sin conexión, avisos de episodios nuevos y un freno a los datos móviles. No trae addons de streams.",
+        figure: "19,1 MB",
+        figureLabel: "todo el APK, con el motor de torrents y el audio de FFmpeg",
+        meta: "Android 10 o más nuevo · Kotlin, Compose, Rust · GPL v3",
+      },
       webtomd: {
         kind: "Proxy de Markdown para LLM",
         body: "Poné md.synrgs.tech/v1/ delante de cualquier URL y recibís la página en Markdown limpio, sin la navegación, los scripts ni los estilos que un modelo pagaría por leer. La instancia es privada, con una clave por persona; el código es abierto, para montar la tuya.",
@@ -399,6 +415,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "Una respuesta real, con el error de tipeo incluido.",
     joltNote: "Vista dividida: dos paneles, cada uno con sus pestañas.",
+    harborNote: "Harbor 0.7.0: Inicio, una serie y Continuar. Pósters de TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Abrir", "Recorré tus archivos STL. La cámara queda donde la dejaste."],
       ["Inspeccionar", "El análisis de malla corre cuando lo pedís, no en cada archivo que abrís."],
@@ -530,7 +547,7 @@ export const copy: Record<Lang, Copy> = {
       rows: [
         {
           name: "Se termina",
-          body: "Acá nada es un concepto. Cinco herramientas, cuatro addons y dos sitios están publicados y en uso hoy.",
+          body: "Acá nada es un concepto. Seis herramientas, cuatro addons y dos sitios están publicados y en uso hoy.",
         },
         {
           name: "Números, no adjetivos",
@@ -614,6 +631,14 @@ export const tools: {
     tone: "#4f8cf7",
     site: { label: "jolt.synrgs.tech", href: "https://jolt.synrgs.tech" },
     repo: "https://github.com/SynrgStudio/jolt",
+  },
+  {
+    id: "harbor",
+    name: "Harbor",
+    icon: "/tools/harbor.svg",
+    tone: "#7dd3fc",
+    site: { label: "harbor.synrgs.tech", href: "https://harbor.synrgs.tech" },
+    repo: "https://github.com/SynrgStudio/harbor-android",
   },
   {
     id: "webtomd",

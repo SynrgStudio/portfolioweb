@@ -134,6 +134,31 @@ export function JoltShot() {
   )
 }
 
+// --------------------------------------------------------------------- Harbor
+// Three real screens of the app, in the frame of a phone.
+export function HarborPhones() {
+  const { t } = useLang()
+  const screens = [
+    { src: "/tools/harbor/home.webp", alt: "Harbor: Home" },
+    { src: "/tools/harbor/title-series.webp", alt: "Harbor: a series" },
+    { src: "/tools/harbor/continue.webp", alt: "Harbor: Continue" },
+  ]
+  return (
+    <Frame note={t.harborNote}>
+      <div className="grid grid-cols-3 gap-3 bg-[radial-gradient(60%_60%_at_50%_45%,color-mix(in_srgb,var(--tone)_14%,transparent),transparent_70%)] p-4 sm:gap-5 sm:p-7">
+        {screens.map((s, i) => (
+          <div
+            key={s.src}
+            className={`rounded-[18px] bg-[linear-gradient(160deg,#1d2129,#0b0d11)] p-[5px] shadow-[0_0_0_1px_#2a2f38,0_30px_60px_-30px_rgba(0,0,0,0.9)] sm:rounded-[22px] ${i === 1 ? "-translate-y-3" : "translate-y-2"}`}
+          >
+            <Image src={s.src} alt={s.alt} width={540} height={1200} sizes="(max-width: 1024px) 30vw, 220px" className="h-auto w-full rounded-[14px] sm:rounded-[17px]" />
+          </div>
+        ))}
+      </div>
+    </Frame>
+  )
+}
+
 // -------------------------------------------------------------------- Caliper
 export function CaliperSteps() {
   const { t } = useLang()

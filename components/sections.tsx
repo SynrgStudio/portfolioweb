@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { useLang } from "@/components/language"
 import { addons, links, sites, tools, type ToolId } from "@/lib/copy"
-import { BreadslicerSteps, CaliperSteps, Frame, JoltShot, SeekTranscript, TokenBars } from "@/components/artifacts"
+import { BreadslicerSteps, CaliperSteps, Frame, HarborPhones, JoltShot, SeekTranscript, TokenBars } from "@/components/artifacts"
 import { Dim } from "@/components/technical"
 import SpecSheet from "@/components/spec-sheet"
 import ContactForm from "@/components/contact-form"
@@ -16,6 +16,7 @@ const artifacts: Record<ToolId, () => React.ReactNode> = {
   seek: SeekTranscript,
   jolt: JoltShot,
   caliper: CaliperSteps,
+  harbor: HarborPhones,
   webtomd: TokenBars,
 }
 

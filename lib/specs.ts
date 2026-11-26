@@ -116,6 +116,53 @@ export const specs: Partial<Record<ToolId, Record<Lang, Spec>>> = {
     },
   },
 
+  harbor: {
+    en: {
+      numbers: [
+        { value: "19.1 MB", label: "the APK for phones, torrent engine and FFmpeg audio included" },
+        { value: "Android 10", label: "or later" },
+        { value: "0", label: "API keys inside the APK: metadata works without signing up" },
+        { value: "0", label: "stream addons inside: it plays what your own addons return" },
+      ],
+      compare: {
+        title: "Janky frames while scrolling Home, on a Galaxy A54 at 120 Hz",
+        rows: [
+          { name: "0.1.0", value: "2.63 %", amount: 2.63 },
+          { name: "0.2.0", value: "1.31 %", amount: 1.31, own: true },
+        ],
+      },
+      highlights: [
+        "Sync both ways with your Stremio account, watched marks in Stremio's own format.",
+        "Every addon asked at once; each one's streams show as soon as it answers.",
+        "Torrents through librqbit, the same Rust engine as Harbor desktop, behind its HTTP API.",
+        "Updates itself from GitHub, checked against the SHA-256 GitHub publishes.",
+      ],
+      note: "Measured on a Samsung Galaxy A54 (Android 16, 120 Hz) with release builds 0.1.0 and 0.2.0; later versions were not measured again. Sizes from the 0.7.0 release.",
+    },
+    es: {
+      numbers: [
+        { value: "19,1 MB", label: "el APK para celulares, con el motor de torrents y el audio de FFmpeg" },
+        { value: "Android 10", label: "o más nuevo" },
+        { value: "0", label: "claves de API dentro del APK: los metadatos andan sin registrarse" },
+        { value: "0", label: "addons de streams adentro: reproduce lo que devuelven tus addons" },
+      ],
+      compare: {
+        title: "Cuadros con tirón al deslizar el Inicio, en un Galaxy A54 a 120 Hz",
+        rows: [
+          { name: "0.1.0", value: "2,63 %", amount: 2.63 },
+          { name: "0.2.0", value: "1,31 %", amount: 1.31, own: true },
+        ],
+      },
+      highlights: [
+        "Sincroniza en los dos sentidos con tu cuenta de Stremio, con los vistos en el formato de Stremio.",
+        "Les pregunta a todos los addons a la vez; los streams de cada uno aparecen apenas contesta.",
+        "Torrents con librqbit, el mismo motor en Rust que Harbor de escritorio, detrás de su API HTTP.",
+        "Se actualiza sola desde GitHub, comparada con el SHA-256 que publica GitHub.",
+      ],
+      note: "Medido en un Samsung Galaxy A54 (Android 16, 120 Hz) con builds de release 0.1.0 y 0.2.0; las versiones siguientes no se volvieron a medir. Tamaños de la release 0.7.0.",
+    },
+  },
+
   jolt: {
     en: {
       numbers: [
