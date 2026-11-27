@@ -164,7 +164,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "A real answer, typo included.",
     joltNote: "Split view: two panes, each with its own tabs.",
-    harborNote: "Harbor 0.8.0: Home, a series and Continue. Posters from TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
+    harborNote: "Harbor 0.7.0: Home, a series and Continue. Posters from TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Open", "Browse your STL files. The camera stays where you left it."],
       ["Inspect", "Mesh analysis runs when you ask, not on every file you open."],
@@ -415,7 +415,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "Una respuesta real, con el error de tipeo incluido.",
     joltNote: "Vista dividida: dos paneles, cada uno con sus pestañas.",
-    harborNote: "Harbor 0.8.0: Inicio, una serie y Continuar. Pósters de TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
+    harborNote: "Harbor 0.7.0: Inicio, una serie y Continuar. Pósters de TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Abrir", "Recorré tus archivos STL. La cámara queda donde la dejaste."],
       ["Inspeccionar", "El análisis de malla corre cuando lo pedís, no en cada archivo que abrís."],
