@@ -142,10 +142,10 @@ export const copy: Record<Lang, Copy> = {
       },
       harbor: {
         kind: "Movies and series on Android",
-        body: "A native Android app for movies and TV series that works with your Stremio account: your addons, your list and what you were watching come along and go back. Its own player with gestures and picture-in-picture, downloads for offline, alerts for new episodes, and a guard on mobile data. It ships no stream addons.",
-        figure: "19.1 MB",
-        figureLabel: "the whole APK, torrent engine and FFmpeg audio included",
-        meta: "Android 10 or later · Kotlin, Compose, Rust · GPL v3",
+        body: "A native Android app for movies and TV series that works with your Stremio account: your addons, your list and what you were watching come along and go back. Its own player with gestures and two subtitles at once, Chromecast and smart TVs, downloads for offline, alerts for new episodes, and a guard on mobile data. It ships no stream addons.",
+        figure: "20.6 MB",
+        figureLabel: "the whole APK, with its torrent engine, FFmpeg audio and Chromecast",
+        meta: "Android 10 or later · Kotlin, Compose, Rust · English, Spanish, Portuguese · GPL v3",
       },
       webtomd: {
         kind: "Markdown proxy for LLMs",
@@ -164,7 +164,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "A real answer, typo included.",
     joltNote: "Split view: two panes, each with its own tabs.",
-    harborNote: "Harbor 0.7.0: Home, a series and Continue. Posters from TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
+    harborNote: "Harbor 0.8.0: Home, a series and Continue. Posters from TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Open", "Browse your STL files. The camera stays where you left it."],
       ["Inspect", "Mesh analysis runs when you ask, not on every file you open."],
@@ -393,10 +393,10 @@ export const copy: Record<Lang, Copy> = {
       },
       harbor: {
         kind: "Películas y series en Android",
-        body: "Una app nativa de Android para películas y series que funciona con tu cuenta de Stremio: tus addons, tu lista y lo que estabas viendo vienen con ella y vuelven. Reproductor propio con gestos e imagen en imagen, descargas para ver sin conexión, avisos de episodios nuevos y un freno a los datos móviles. No trae addons de streams.",
-        figure: "19,1 MB",
-        figureLabel: "todo el APK, con el motor de torrents y el audio de FFmpeg",
-        meta: "Android 10 o más nuevo · Kotlin, Compose, Rust · GPL v3",
+        body: "Una app nativa de Android para películas y series que funciona con tu cuenta de Stremio: tus addons, tu lista y lo que estabas viendo vienen con ella y vuelven. Reproductor propio con gestos y dos subtítulos a la vez, Chromecast y teles inteligentes, descargas para ver sin conexión, avisos de episodios nuevos y un freno a los datos móviles. No trae addons de streams.",
+        figure: "20,6 MB",
+        figureLabel: "todo el APK, con su motor de torrents, el audio de FFmpeg y Chromecast",
+        meta: "Android 10 o más nuevo · Kotlin, Compose, Rust · inglés, español, portugués · GPL v3",
       },
       webtomd: {
         kind: "Proxy de Markdown para LLM",
@@ -415,7 +415,7 @@ export const copy: Record<Lang, Copy> = {
     },
     seekNote: "Una respuesta real, con el error de tipeo incluido.",
     joltNote: "Vista dividida: dos paneles, cada uno con sus pestañas.",
-    harborNote: "Harbor 0.7.0: Inicio, una serie y Continuar. Pósters de TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
+    harborNote: "Harbor 0.8.0: Inicio, una serie y Continuar. Pósters de TMDB · Tears of Steel (CC BY 3.0) Blender Foundation | mango.blender.org",
     caliperSteps: [
       ["Abrir", "Recorré tus archivos STL. La cámara queda donde la dejaste."],
       ["Inspeccionar", "El análisis de malla corre cuando lo pedís, no en cada archivo que abrís."],
